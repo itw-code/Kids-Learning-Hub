@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export default function TapToFill({ svgData, selectedColor }) {
+  const containerRef = useRef(null);
+  
+  // Keep selectedColor in a ref so the click handler always has access to the latest color
+  // without triggering a re-render/re-injection of the SVG.
+  const colorRef = useRef(selectedColor);
+  useEffect(() => {
+    colorRef.current = selectedColor;
+  }, [selectedColor]);
+
+  // Only inject the SVG when svgData changes
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.innerHTML = svgData;
+    }
+  }, [svgData]);
+
   const handleSvgClick = (e) => {
     const target = e.target;
     const fillableTags = ['path', 'polygon', 'circle', 'ellipse', 'rect'];
@@ -14,15 +30,15 @@ export default function TapToFill({ svgData, selectedColor }) {
         return;
       }
       
-      target.setAttribute('fill', selectedColor);
+      target.setAttribute('fill', colorRef.current);
     }
   };
 
   return (
     <div 
+      ref={containerRef}
       className="svg-fill-container"
       onClick={handleSvgClick}
-      dangerouslySetInnerHTML={{ __html: svgData }}
       style={{
         width: '100%',
         height: '100%',

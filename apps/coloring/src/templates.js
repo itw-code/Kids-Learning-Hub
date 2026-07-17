@@ -11,7 +11,7 @@ export const TEMPLATES = {
   lion: {
     name: 'Happy Lion 🦁',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <circle cx="400" cy="300" r="180" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
       <circle cx="300" cy="180" r="45" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -26,7 +26,7 @@ export const TEMPLATES = {
   elephant: {
     name: 'Cute Elephant 🐘',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Body -->
       <rect x="250" y="240" width="320" height="220" rx="60" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -46,7 +46,7 @@ export const TEMPLATES = {
   panda: {
     name: 'Chubby Panda 🐼',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ears -->
       <circle cx="280" cy="160" r="45" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -67,7 +67,7 @@ export const TEMPLATES = {
   penguin: {
     name: 'Happy Penguin 🐧',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Feet -->
       <ellipse cx="330" cy="510" rx="45" ry="20" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -89,7 +89,7 @@ export const TEMPLATES = {
   frog: {
     name: 'Jumping Frog 🐸',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Legs -->
       <ellipse cx="230" cy="420" rx="60" ry="80" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -109,7 +109,7 @@ export const TEMPLATES = {
   bear: {
     name: 'Friendly Bear 🐻',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ears -->
       <circle cx="280" cy="180" r="45" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -130,7 +130,7 @@ export const TEMPLATES = {
   cat: {
     name: 'Little Kitty 🐱',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ears -->
       <polygon points="270,220 270,100 350,170" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -155,7 +155,7 @@ export const TEMPLATES = {
   dog: {
     name: 'Playful Puppy 🐶',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ears -->
       <ellipse cx="260" cy="220" rx="35" ry="85" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" transform="rotate(15 260 220)" />
@@ -175,7 +175,7 @@ export const TEMPLATES = {
   rabbit: {
     name: 'Bunny Rabbit 🐰',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Long Ears -->
       <ellipse cx="340" cy="120" rx="30" ry="110" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -197,7 +197,7 @@ export const TEMPLATES = {
   monkey: {
     name: 'Cheeky Monkey 🐒',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ears -->
       <circle cx="270" cy="240" r="40" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -218,7 +218,7 @@ export const TEMPLATES = {
   butterfly: {
     name: 'Lovely Butterfly 🦋',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Wings Left -->
       <path d="M 380 300 C 200 120 120 240 220 320 C 120 400 200 480 380 340" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -237,7 +237,7 @@ export const TEMPLATES = {
   bee: {
     name: 'Buzzy Bee 🐝',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Wings -->
       <ellipse cx="370" cy="170" rx="50" ry="70" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" transform="rotate(-30 370 170)" />
@@ -256,7 +256,7 @@ export const TEMPLATES = {
   fish: {
     name: 'Happy Fish 🐟',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Tail Fin -->
       <polygon points="150,300 50,180 90,300 50,420" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -273,7 +273,7 @@ export const TEMPLATES = {
   turtle: {
     name: 'Tiny Turtle 🐢',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Flippers/Feet -->
       <ellipse cx="230" cy="220" rx="60" ry="30" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" transform="rotate(-30 230 220)" />
@@ -294,7 +294,7 @@ export const TEMPLATES = {
   owl: {
     name: 'Wise Owl 🦉',
     category: 'animals',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Body -->
       <ellipse cx="400" cy="340" rx="140" ry="180" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -315,7 +315,7 @@ export const TEMPLATES = {
   rocket: {
     name: 'Space Rocket 🚀',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Fins -->
       <polygon points="260,420 200,500 300,480" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -332,7 +332,7 @@ export const TEMPLATES = {
   airplane: {
     name: 'Toy Airplane ✈️',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Tail wing -->
       <polygon points="180,260 120,160 160,260" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -348,7 +348,7 @@ export const TEMPLATES = {
   helicopter: {
     name: 'Helicopter 🚁',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Tail Rotor -->
       <line x1="200" y1="300" x2="100" y2="300" stroke="#000000" stroke-width="12" />
@@ -369,7 +369,7 @@ export const TEMPLATES = {
   car: {
     name: 'Little Car 🚗',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Roof/Cabin -->
       <path d="M 280 300 L 350 200 L 530 200 L 600 300 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -388,7 +388,7 @@ export const TEMPLATES = {
   bus: {
     name: 'School Bus 🚌',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Main Body -->
       <rect x="150" y="160" width="500" height="240" rx="30" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -408,7 +408,7 @@ export const TEMPLATES = {
   train: {
     name: 'Choo-Choo Train 🚂',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cabin -->
       <rect x="400" y="200" width="180" height="200" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -428,7 +428,7 @@ export const TEMPLATES = {
   truck: {
     name: 'Big Dump Truck 🚚',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Dump bed -->
       <polygon points="160,200 480,200 480,360 160,360" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -444,7 +444,7 @@ export const TEMPLATES = {
   ship: {
     name: 'Sailing Ship ⛵',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Hull -->
       <polygon points="180,360 620,360 560,460 240,460" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -458,7 +458,7 @@ export const TEMPLATES = {
   submarine: {
     name: 'Yellow Submarine submarine',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Periscope -->
       <path d="M 400 200 L 400 130 L 440 130" stroke="#000000" stroke-width="12" fill="none" />
@@ -475,7 +475,7 @@ export const TEMPLATES = {
   tractor: {
     name: 'Farm Tractor 🚜',
     category: 'vehicles',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cab -->
       <rect x="420" y="180" width="160" height="180" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -496,7 +496,7 @@ export const TEMPLATES = {
   sun: {
     name: 'Bright Sun ☀️',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Rays -->
       <line x1="400" y1="100" x2="400" y2="170" stroke="#000000" stroke-width="12" stroke-linecap="round" />
@@ -514,7 +514,7 @@ export const TEMPLATES = {
   cloud: {
     name: 'Fluffy Cloud ☁️',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cloud Bubbles -->
       <path d="M 250 380 Q 200 320 250 260 Q 300 200 380 240 Q 450 160 520 220 Q 600 240 580 330 Q 620 380 550 410 L 250 410 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -523,7 +523,7 @@ export const TEMPLATES = {
   rainbow: {
     name: 'Magical Rainbow 🌈',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Rainbow Arcs (drawn as nested shapes) -->
       <path d="M 150 450 A 250 250 0 0 1 650 450" stroke="#000000" stroke-width="40" fill="none" />
@@ -537,7 +537,7 @@ export const TEMPLATES = {
   tree: {
     name: 'Tall Green Tree 🌳',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Trunk -->
       <rect x="365" y="360" width="70" height="180" rx="10" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -550,7 +550,7 @@ export const TEMPLATES = {
   flower: {
     name: 'Cute Flower 🌸',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Petals -->
       <circle cx="330" cy="230" r="80" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -564,7 +564,7 @@ export const TEMPLATES = {
   cactus: {
     name: 'Desert Cactus 🌵',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Main trunk -->
       <rect x="360" y="160" width="80" height="340" rx="40" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -581,7 +581,7 @@ export const TEMPLATES = {
   star: {
     name: 'Shining Star ⭐',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Star Polygon -->
       <polygon points="400,80 480,240 650,250 520,360 560,530 400,440 240,530 280,360 150,250 320,240" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -590,7 +590,7 @@ export const TEMPLATES = {
   moon: {
     name: 'Sleepy Moon 🌙',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Crescent shape -->
       <path d="M 480 140 A 180 180 0 1 0 480 460 A 140 140 0 1 1 480 140" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -599,7 +599,7 @@ export const TEMPLATES = {
   mushroom: {
     name: 'Forest Mushroom 🍄',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Stem -->
       <rect x="360" y="340" width="80" height="190" rx="30" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -614,7 +614,7 @@ export const TEMPLATES = {
   mountain: {
     name: 'Snowy Mountain 🏔️',
     category: 'nature',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Big Mountain -->
       <polygon points="400,120 150,500 650,500" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -627,7 +627,7 @@ export const TEMPLATES = {
   pizza: {
     name: 'Yummy Pizza 🍕',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Crust -->
       <path d="M 220 180 Q 400 130 580 180 L 400 500 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -642,7 +642,7 @@ export const TEMPLATES = {
   cupcake: {
     name: 'Sweet Cupcake 🧁',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cup/Base -->
       <polygon points="260,340 540,340 490,520 310,520" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -659,7 +659,7 @@ export const TEMPLATES = {
   icecream: {
     name: 'Ice Cream Cone 🍦',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cone -->
       <polygon points="300,340 500,340 400,550" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -675,7 +675,7 @@ export const TEMPLATES = {
   burger: {
     name: 'Big Burger 🍔',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Top Bun -->
       <path d="M 230 250 C 230 130 570 130 570 250 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -690,7 +690,7 @@ export const TEMPLATES = {
   apple: {
     name: 'Red Apple 🍎',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Leaf -->
       <path d="M 400 170 Q 450 110 420 80 Q 370 140 400 170" stroke="#000000" stroke-width="10" fill="#ffffff" class="fillable" />
@@ -703,7 +703,7 @@ export const TEMPLATES = {
   strawberry: {
     name: 'Strawberry 🍓',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Leaves on top -->
       <polygon points="340,160 400,200 370,140" stroke="#000000" stroke-width="10" fill="#ffffff" class="fillable" />
@@ -722,7 +722,7 @@ export const TEMPLATES = {
   watermelon: {
     name: 'Watermelon Slice 🍉',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Outer Rind -->
       <path d="M 180 250 A 220 220 0 0 0 620 250 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -737,7 +737,7 @@ export const TEMPLATES = {
   pineapple: {
     name: 'Sweet Pineapple 🍍',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Leaf crown -->
       <path d="M 400 200 C 370 120 330 100 350 60 C 390 140 400 200 400 200 Z" stroke="#000000" stroke-width="10" fill="#ffffff" class="fillable" />
@@ -752,7 +752,7 @@ export const TEMPLATES = {
   cherry: {
     name: 'Sweet Cherries 🍒',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Cherry 1 -->
       <circle cx="300" cy="380" r="75" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -766,7 +766,7 @@ export const TEMPLATES = {
   donut: {
     name: 'Glazed Donut 🍩',
     category: 'food',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Main Donut Outer -->
       <circle cx="400" cy="300" r="160" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -781,7 +781,7 @@ export const TEMPLATES = {
   unicorn: {
     name: 'Magic Unicorn 🦄',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Head -->
       <path d="M 260 260 L 320 150 Q 380 150 440 200 L 460 300 Q 480 370 430 380 L 350 360 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -798,7 +798,7 @@ export const TEMPLATES = {
   castle: {
     name: 'Fairytale Castle 🏰',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Left Tower -->
       <rect x="200" y="240" width="80" height="260" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -819,7 +819,7 @@ export const TEMPLATES = {
   dragon: {
     name: 'Baby Dragon 🐉',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Wings -->
       <path d="M 280 270 Q 150 180 180 340 L 280 320 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -841,7 +841,7 @@ export const TEMPLATES = {
   wizard: {
     name: 'Wizard Hat 🧙',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Hat Rim -->
       <ellipse cx="400" cy="460" rx="240" ry="40" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -854,7 +854,7 @@ export const TEMPLATES = {
   crown: {
     name: 'Royal Crown 👑',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Crown Shape -->
       <path d="M 180 460 L 140 220 L 280 350 L 400 160 L 520 350 L 660 220 L 620 460 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -869,7 +869,7 @@ export const TEMPLATES = {
   mermaid: {
     name: 'Little Mermaid 🧜',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Tail fin -->
       <path d="M 380 450 L 330 520 L 400 490 L 470 520 L 420 450 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -887,7 +887,7 @@ export const TEMPLATES = {
   robot: {
     name: 'Cute Robot 🤖',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Head -->
       <rect x="300" y="160" width="200" height="130" rx="20" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -907,7 +907,7 @@ export const TEMPLATES = {
   ghost: {
     name: 'Spooky Ghost 👻',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Ghost body -->
       <path d="M 280 420 L 280 240 C 280 120 520 120 520 240 L 520 420 Q 490 390 460 420 Q 430 390 400 420 Q 370 390 340 420 Q 310 390 280 420 Z" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -921,7 +921,7 @@ export const TEMPLATES = {
   ufo: {
     name: 'Space UFO 🛸',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Light Beam -->
       <polygon points="340,360 460,360 580,550 220,550" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
@@ -944,7 +944,7 @@ export const TEMPLATES = {
   treasure: {
     name: 'Treasure Chest 🏴‍☠️',
     category: 'fantasy',
-    svg: `<svg viewBox="0 0 800 600" width="100%" height="100%">
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
       <rect x="0" y="0" width="800" height="600" fill="none" />
       <!-- Chest Base -->
       <rect x="230" y="320" width="340" height="200" rx="20" stroke="#000000" stroke-width="12" fill="#ffffff" class="fillable" />
