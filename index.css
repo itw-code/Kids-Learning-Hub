@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at 20% 20%, #4361ee 0%, #3f37c9 30%, #7209b7 60%, #f72585 100%);
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+#hub-container {
+  width: 100%;
+  max-width: 1024px;
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+header h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  letter-spacing: -1px;
+  background: linear-gradient(to right, #ffd60a, #ff9e00, #ff007f, #00f0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.grid-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  width: 100%;
+  padding: 10px;
+}
+
+.menu-card {
+  text-decoration: none;
+  border-radius: 28px;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%);
+  pointer-events: none;
+}
+
+/* Animations and Hover/Active State */
+.menu-card:active {
+  transform: scale(0.92);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Kid-friendly card icon bounce animation */
+.menu-card:hover .card-icon {
+  animation: bounce 0.6s infinite alternate;
+}
+
+.card-icon {
+  font-size: 5rem;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+  display: inline-block;
+}
+
+.card-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme Colors for Grid Cards */
+.color-blue {
+  background: linear-gradient(135deg, #4895ef, #4361ee);
+}
+.color-green {
+  background: linear-gradient(135deg, #4cc9f0, #4895ef);
+}
+.color-yellow {
+  background: linear-gradient(135deg, #ffd166, #ffb703);
+  color: #102a43;
+}
+.color-yellow .card-title {
+  text-shadow: none;
+}
+.color-purple {
+  background: linear-gradient(135deg, #7209b7, #3f37c9);
+}
+.color-red {
+  background: linear-gradient(135deg, #f72585, #b5179e);
+}
+.color-orange {
+  background: linear-gradient(135deg, #ff9e00, #f77f00);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-12px); }
+}
+
+/* Safari Safe-Area and Landscape Layout adjustments for iPad */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 2rem;
+  }
+  .grid-menu {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .menu-card {
+    padding: 25px 15px;
+  }
+  .card-icon {
+    font-size: 3.5rem;
+  }
+  .card-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-menu {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Kids Learning Hub</title>
+  <link rel="stylesheet" href="/index.css">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- iOS Meta Tags for PWA install capability in Safari -->
+  <meta name="theme-color" content="#4cc9f0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kids Hub">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
+</head>
+<body>
+  <div id="hub-container">
+    <header>
+      <h1>Kids Learning Hub 🚀</h1>
+    </header>
+    <main class="grid-menu">
+      <a href="/apps/alphabet/index.html" class="menu-card color-blue">
+        <span class="card-icon">🔤</span>
+        <span class="card-title">Alphabet</span>
+      </a>
+      <a href="/apps/numbers/index.html" class="menu-card color-green">
+        <span class="card-icon">🔢</span>
+        <span class="card-title">Numbers</span>
+      </a>
+      <a href="/apps/spelling/index.html" class="menu-card color-yellow">
+        <span class="card-icon">✏️</span>
+        <span class="card-title">Spelling</span>
+      </a>
+      <a href="/apps/shapes/index.html" class="menu-card color-purple">
+        <span class="card-icon">📐</span>
+        <span class="card-title">Shapes</span>
+      </a>
+      <a href="/apps/puzzles/index.html" class="menu-card color-red">
+        <span class="card-icon">🧩</span>
+        <span class="card-title">Puzzles</span>
+      </a>
+      <a href="/apps/coloring/index.html" class="menu-card color-orange">
+        <span class="card-icon">🎨</span>
+        <span class="card-title">Coloring</span>
+      </a>
+    </main>
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('ServiceWorker registered with scope: ', reg.scope))
+          .catch(err => console.error('ServiceWorker registration failed: ', err));
+      });
+    }
+  </script>
+</body>
+</html>
