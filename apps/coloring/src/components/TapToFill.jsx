@@ -17,28 +17,40 @@ export default function TapToFill({ svgData, selectedColor }) {
     }
   }, [svgData]);
 
-  const handleSvgClick = (e) => {
-    const target = e.target;
-    const fillableTags = ['path', 'polygon', 'circle', 'ellipse', 'rect'];
-    if (fillableTags.includes(target.tagName.toLowerCase())) {
-      const fill = target.getAttribute('fill');
-      const id = target.getAttribute('id');
-      const isFillable = target.classList.contains('fillable');
-      
-      // Skip if it's explicitly non-fillable or not marked as fillable in templates
-      if (fill === 'none' || id === 'outline' || !isFillable) {
-        return;
+  // Attach native click listener because dynamically injected HTML nodes
+  // do not bubble synthetic onClick events in React virtual DOM.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleSvgClick = (e) => {
+      const target = e.target;
+      const fillableTags = ['path', 'polygon', 'circle', 'ellipse', 'rect'];
+      if (fillableTags.includes(target.tagName.toLowerCase())) {
+        const fill = target.getAttribute('fill');
+        const id = target.getAttribute('id');
+        const isFillable = target.classList.contains('fillable') || 
+                           (target.getAttribute('class') && target.getAttribute('class').includes('fillable'));
+        
+        // Skip if it's explicitly non-fillable or not marked as fillable in templates
+        if (fill === 'none' || id === 'outline' || !isFillable) {
+          return;
+        }
+        
+        target.setAttribute('fill', colorRef.current);
       }
-      
-      target.setAttribute('fill', colorRef.current);
-    }
-  };
+    };
+
+    container.addEventListener('click', handleSvgClick);
+    return () => {
+      container.removeEventListener('click', handleSvgClick);
+    };
+  }, [svgData]);
 
   return (
     <div 
       ref={containerRef}
       className="svg-fill-container"
-      onClick={handleSvgClick}
       style={{
         width: '100%',
         height: '100%',

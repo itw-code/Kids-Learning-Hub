@@ -1,0 +1,12 @@
+{
+  "name": "kids-learning-hub-tests",
+  "version": "1.0.0",
+  "description": "Automated Playwright integration tests for Kids Learning Hub",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
+  }
+}
