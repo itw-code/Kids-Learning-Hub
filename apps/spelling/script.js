@@ -69,8 +69,8 @@
             });
         });
 
-        const goodSound = new Audio('sounds/correct.mp3');
-        const badSound = new Audio('sounds/wrong.mp3');
+        const goodSound = new Audio('/apps/spelling/sounds/correct.mp3');
+        const badSound = new Audio('/apps/spelling/sounds/wrong.mp3');
 
         // --- 2. HELPER FUNCTIONS ---
         function shuffleArray(array) {

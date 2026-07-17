@@ -4,7 +4,7 @@
     const homeLinks = document.querySelectorAll('a[href="../index.html"], a.home-btn-subpage, a.home-button');
     if (homeLinks.length > 0) {
       homeLinks.forEach(function (link) {
-        link.setAttribute('href', '/index.html');
+        link.setAttribute('href', '/');
       });
       return; // Found and fixed existing link, no need to create floating button
     }
@@ -28,7 +28,7 @@
         e.preventDefault();
         e.stopPropagation();
       }
-      window.location.href = '/index.html';
+      window.location.href = '/';
     };
 
     homeBtn.addEventListener('click', goHome);

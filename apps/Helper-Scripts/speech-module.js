@@ -181,9 +181,9 @@ window.speakText = function(text, onEndCallback) {
 
         // 2. DEFINE SONGS
         const SONG_LIST = [
-            prefix + 'music/song1.mp3',
-            prefix + 'music/song2.mp3',
-            prefix + 'music/song3.mp3'
+            '/apps/music/song1.mp3',
+            '/apps/music/song2.mp3',
+            '/apps/music/song3.mp3'
         ];
 
         // 3. INJECT HTML

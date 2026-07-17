@@ -133,8 +133,8 @@
         const alphabetPrompt = document.getElementById('alphabet-prompt');
 
         // --- Corrected path to sounds folder ---
-        const goodSound = new Audio('sounds/correct.mp3');
-        const badSound = new Audio('sounds/wrong.mp3');
+        const goodSound = new Audio('/apps/alphabet/sounds/correct.mp3');
+        const badSound = new Audio('/apps/alphabet/sounds/wrong.mp3');
 
         // --- NEW: Game State ---
         let currentGameMode = 'level1'; // 'level1' or 'level2'

@@ -48,8 +48,8 @@
         });
 
         // --- 2. AUDIO & HELPERS ---
-        const correctSound = new Audio('sounds/correct.mp3');
-        const wrongSound = new Audio('sounds/wrong.mp3');
+        const correctSound = new Audio('/apps/shapes/sounds/correct.mp3');
+        const wrongSound = new Audio('/apps/shapes/sounds/wrong.mp3');
         let audioPrimed = false;
 
         async function playSound(sound) {
