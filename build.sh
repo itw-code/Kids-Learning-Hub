@@ -48,6 +48,15 @@ cp -r apps/shapes dist/apps/
 echo "📁 Copying Puzzles game..."
 cp -r apps/puzzles dist/apps/
 
+echo "📁 Copying global Helper-Scripts..."
+cp -r apps/Helper-Scripts dist/apps/
+
+echo "📁 Copying global images..."
+cp -r apps/images dist/apps/
+
+echo "📁 Copying global music..."
+cp -r apps/music dist/apps/
+
 # Overwrite coloring app folder with its compiled build output
 echo "📁 Packaging compiled React Coloring Book..."
 rm -rf dist/apps/coloring

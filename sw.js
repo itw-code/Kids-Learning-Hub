@@ -42,6 +42,17 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // Bypass service worker for range requests or audio/video assets
+  if (
+    e.request.headers.get('range') ||
+    e.request.url.includes('.mp3') ||
+    e.request.url.includes('.wav') ||
+    e.request.destination === 'audio' ||
+    e.request.destination === 'video'
+  ) {
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
       if (cachedResponse) {

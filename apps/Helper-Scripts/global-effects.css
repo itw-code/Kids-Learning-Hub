@@ -1,0 +1,72 @@
+/* Helper-Scripts/global-effects.css */
+/* --- START: Confetti Win Effect --- */
+
+.confetti-particle {
+    position: fixed; 
+    top: -50px; /* Start a bit higher up to ensure it's off-screen */
+
+    font-size: 20px;
+    opacity: 1;
+    z-index: 1000; 
+    pointer-events: none; 
+    
+    /* Hardware acceleration hints for iOS */
+    transform: translate3d(0, 0, 0);
+    will-change: transform; 
+    
+    animation-name: confetti-fall;
+    animation-duration: var(--random-duration);
+    /* REMOVED: animation-delay */
+    animation-timing-function: linear;
+    animation-fill-mode: forwards; 
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotateZ(0deg); /* <-- REMOVED rotateY */
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotateZ(var(--random-rotate)); /* <-- REMOVED rotateY */
+        opacity: 0;
+    }
+}
+
+/* --- END: Confetti Win Effect --- */
+
+/* * A single particle for the "burst" effect.
+ * It's positioned, animated, and then removed by JS.
+ */
+.burst-particle {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  font-size: 20px; /* Use the same nice size as confetti */
+  
+  /* Start centered on the click point and small */
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 1;
+  
+  /* Animation properties */
+  animation-name: confetti-burst;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+/* * The animation keyframes for the burst.
+ * It uses JS variables to know where to fly.
+ */
+@keyframes confetti-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    /* * Fly to the random destination set by --dest-x/--dest-y,
+     * scale up, and fade out.
+     */
+    transform: translate(var(--dest-x), var(--dest-y)) scale(1.2);
+    opacity: 0;
+  }
+}
