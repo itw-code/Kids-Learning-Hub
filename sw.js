@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kids-hub-v1';
+const CACHE_NAME = 'kids-hub-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,12 +9,12 @@ const ASSETS = [
   '/assets/icon-192.png',
   '/assets/icon-512.png',
   // Cache sub-apps index pages for immediate launch
-  '/apps/alphabet/index.html',
-  '/apps/numbers/index.html',
-  '/apps/spelling/index.html',
-  '/apps/shapes/index.html',
-  '/apps/puzzles/index.html',
-  '/apps/coloring/index.html'
+  '/apps/alphabet/',
+  '/apps/numbers/',
+  '/apps/spelling/',
+  '/apps/shapes/',
+  '/apps/puzzles/',
+  '/apps/coloring/'
 ];
 
 self.addEventListener('install', (e) => {
