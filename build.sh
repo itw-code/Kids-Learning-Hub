@@ -45,9 +45,6 @@ cp -r apps/spelling dist/apps/
 echo "📁 Copying Shapes game..."
 cp -r apps/shapes dist/apps/
 
-echo "📁 Copying Puzzles game..."
-cp -r apps/puzzles dist/apps/
-
 echo "📁 Copying global Helper-Scripts..."
 cp -r apps/Helper-Scripts dist/apps/
 
