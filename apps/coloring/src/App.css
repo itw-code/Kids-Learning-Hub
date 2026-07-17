@@ -157,3 +157,204 @@
     height: 38px;
   }
 }
+
+/* Premium Gallery Modal */
+.gallery-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(16, 42, 67, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.gallery-content {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  height: 85vh;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.gallery-header h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #102a43;
+  font-family: 'Comic Neue', cursive, sans-serif;
+  font-weight: bold;
+}
+
+.close-gallery-btn {
+  background-color: #ff595e;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(255, 89, 94, 0.3);
+  transition: transform 0.1s;
+}
+
+.close-gallery-btn:active {
+  transform: scale(0.9);
+}
+
+.category-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.category-tab {
+  background-color: #f0f4f8;
+  border: 3px solid transparent;
+  color: #102a43;
+  padding: 10px 20px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-tab.active {
+  background-color: #ffd60a;
+  border-color: #ffc300;
+  box-shadow: 0 4px 8px rgba(255, 214, 10, 0.25);
+}
+
+.templates-grid-viewport {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.template-card {
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+  border: 3px solid transparent;
+  border-radius: 20px;
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.template-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-color: #ffd60a;
+}
+
+.template-card.active {
+  background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+  border-color: #ffc300;
+  box-shadow: 0 6px 12px rgba(255, 195, 0, 0.2);
+}
+
+.card-emoji {
+  font-size: 52px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.card-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #102a43;
+  text-align: center;
+  font-family: 'Comic Neue', cursive, sans-serif;
+}
+
+.open-gallery-btn {
+  background-color: #ffd60a;
+  color: #102a43;
+  border: 3px solid #ffc300;
+  padding: 12px 24px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(255, 214, 10, 0.3);
+  transition: all 0.15s ease;
+}
+
+.open-gallery-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 214, 10, 0.4);
+}
+
+.open-gallery-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .gallery-content {
+    height: 90vh;
+    padding: 15px;
+  }
+  .gallery-header h2 {
+    font-size: 20px;
+  }
+  .templates-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+  .card-emoji {
+    font-size: 36px;
+  }
+  .card-name {
+    font-size: 12px;
+  }
+}
+

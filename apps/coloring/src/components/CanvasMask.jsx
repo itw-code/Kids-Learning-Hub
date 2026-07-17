@@ -1,128 +1,52 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { TEMPLATES } from '../templates';
 
-// Programmatic templates for high-contrast line art and ID maps
-const templates = {
-  flower: {
-    name: 'Cute Flower 🌸',
-    draw: (ctx, isIdMap) => {
-      const cx = 400, cy = 300;
-      ctx.lineWidth = 12;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-
-      const colors = isIdMap ? [
-        '#ff595e', // Petal 1
-        '#ffca3a', // Petal 2
-        '#8ac926', // Petal 3
-        '#1982c4', // Petal 4
-        '#6a4c93'  // Center
-      ] : ['#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'];
-
-      // Draw petals
-      const petalOffsets = [
-        { dx: -70, dy: -70 },
-        { dx: 70, dy: -70 },
-        { dx: -70, dy: 70 },
-        { dx: 70, dy: 70 }
-      ];
-
-      petalOffsets.forEach((offset, idx) => {
-        ctx.beginPath();
-        ctx.arc(cx + offset.dx, cy + offset.dy, 80, 0, Math.PI * 2);
-        ctx.fillStyle = colors[idx];
-        ctx.fill();
-        ctx.strokeStyle = '#000000';
-        ctx.stroke();
-      });
-
-      // Draw center circle
-      ctx.beginPath();
-      ctx.arc(cx, cy, 90, 0, Math.PI * 2);
-      ctx.fillStyle = colors[4];
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-    }
-  },
-  house: {
-    name: 'Happy Playhouse 🏠',
-    draw: (ctx, isIdMap) => {
-      ctx.lineWidth = 12;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-
-      const colors = isIdMap ? {
-        sky: '#e0f7fa',
-        roof: '#ff595e',
-        wall: '#ffca3a',
-        door: '#8ac926',
-        window: '#1982c4'
-      } : {
-        sky: '#ffffff',
-        roof: '#ffffff',
-        wall: '#ffffff',
-        door: '#ffffff',
-        window: '#ffffff'
-      };
-
-      // Background Sky area
-      ctx.fillStyle = colors.sky;
-      ctx.fillRect(0, 0, 800, 600);
-
-      // House Wall
-      ctx.beginPath();
-      ctx.rect(220, 260, 360, 240);
-      ctx.fillStyle = colors.wall;
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-
-      // House Roof
-      ctx.beginPath();
-      ctx.moveTo(170, 260);
-      ctx.lineTo(400, 100);
-      ctx.lineTo(630, 260);
-      ctx.closePath();
-      ctx.fillStyle = colors.roof;
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-
-      // Window
-      ctx.beginPath();
-      ctx.rect(270, 310, 80, 80);
-      ctx.fillStyle = colors.window;
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-
-      // Window Cross lines
-      ctx.beginPath();
-      ctx.moveTo(310, 310);
-      ctx.lineTo(310, 390);
-      ctx.moveTo(270, 350);
-      ctx.lineTo(350, 350);
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-
-      // Door
-      ctx.beginPath();
-      ctx.rect(430, 340, 90, 160);
-      ctx.fillStyle = colors.door;
-      ctx.fill();
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
-    }
-  }
+// Helper to generate distinct RGB values based on index
+const getIdColor = (index) => {
+  const r = ((index * 37) % 7) * 35 + 40;
+  const g = ((index * 59) % 7) * 35 + 40;
+  const b = ((index * 83) % 7) * 35 + 40;
+  return [r, g, b];
 };
 
-export { templates };
+// Generates an SVG string with unique fill colors for fillable paths
+const generateIdMapSvg = (svgString) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  
+  const fillables = svgEl.querySelectorAll('.fillable');
+  fillables.forEach((el, index) => {
+    const [r, g, b] = getIdColor(index);
+    const colorHex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    el.setAttribute('fill', colorHex);
+  });
+  
+  const serializer = new XMLSerializer();
+  return serializer.serializeToString(doc);
+};
+
+// Generates an SVG string with fill="none" to isolate outlines
+const generateOutlineSvg = (svgString) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  
+  const fillables = svgEl.querySelectorAll('.fillable');
+  fillables.forEach(el => {
+    el.setAttribute('fill', 'none');
+  });
+  
+  const serializer = new XMLSerializer();
+  return serializer.serializeToString(doc);
+};
 
 export default function CanvasMask({ templateKey = 'flower', selectedColor, brushSize = 18 }) {
   const canvasRef = useRef(null);
   const idCanvasRef = useRef(null);
   const maskCanvasRef = useRef(null);
   const tempCanvasRef = useRef(null);
+  const outlineImageRef = useRef(null);
   
   const [isDrawing, setIsDrawing] = useState(false);
   const [activeColorId, setActiveColorId] = useState(null);
@@ -130,19 +54,50 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
   // Initialize templates on canvases
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const idCanvas = idCanvasRef.current;
     const idCtx = idCanvas.getContext('2d');
 
-    // Clear and draw template
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    idCtx.clearRect(0, 0, idCanvas.width, idCanvas.height);
+    const template = TEMPLATES[templateKey];
+    if (!template) return;
 
-    const template = templates[templateKey];
-    if (template) {
-      template.draw(idCtx, true);   // ID map drawing
-      template.draw(ctx, false);    // Visible white drawing template
-    }
+    const rawSvg = template.svg;
+    const idMapSvg = generateIdMapSvg(rawSvg);
+    const outlineSvg = generateOutlineSvg(rawSvg);
+
+    // Render visible SVG template (white background + black lines)
+    const visibleImg = new Image();
+    const visibleBlob = new Blob([rawSvg], { type: 'image/svg+xml;charset=utf-8' });
+    const visibleUrl = URL.createObjectURL(visibleBlob);
+    visibleImg.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(visibleImg, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(visibleUrl);
+    };
+    visibleImg.src = visibleUrl;
+
+    // Render ID Map SVG to hidden canvas
+    const idImg = new Image();
+    const idBlob = new Blob([idMapSvg], { type: 'image/svg+xml;charset=utf-8' });
+    const idUrl = URL.createObjectURL(idBlob);
+    idImg.onload = () => {
+      idCtx.clearRect(0, 0, idCanvas.width, idCanvas.height);
+      idCtx.drawImage(idImg, 0, 0, idCanvas.width, idCanvas.height);
+      URL.revokeObjectURL(idUrl);
+    };
+    idImg.src = idUrl;
+
+    // Preload outline image for synchronous drawing on top
+    const outlineImg = new Image();
+    const outlineBlob = new Blob([outlineSvg], { type: 'image/svg+xml;charset=utf-8' });
+    const outlineUrl = URL.createObjectURL(outlineBlob);
+    outlineImg.onload = () => {
+      outlineImageRef.current = outlineImg;
+      URL.revokeObjectURL(outlineUrl);
+    };
+    outlineImg.src = outlineUrl;
+
   }, [templateKey]);
 
   const getPixelRGB = (ctx, x, y) => {
@@ -261,7 +216,6 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
     scratchCtx.drawImage(maskCanvasRef.current, 0, 0);
     
     ctx.drawImage(scratchCanvas, 0, 0);
-    
     ctx.restore();
   };
 
@@ -273,9 +227,8 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
     // Redraw template outlines to cover overlapping brush edge pixels
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const template = templates[templateKey];
-    if (template) {
-      template.draw(ctx, false);
+    if (outlineImageRef.current) {
+      ctx.drawImage(outlineImageRef.current, 0, 0, canvas.width, canvas.height);
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TapToFill from './components/TapToFill';
-import CanvasMask, { templates } from './components/CanvasMask';
+import CanvasMask from './components/CanvasMask';
+import { CATEGORIES, TEMPLATES } from './templates';
 import './App.css';
 
 // Child-friendly palette (bold, cheerful colors)
@@ -16,38 +17,14 @@ const PALETTE = [
   '#ffffff', // White (eraser)
 ];
 
-// Simple child-friendly SVGs for Tap-to-Fill mode
-const SVG_TEMPLATES = {
-  flower: `<svg viewBox="0 0 800 600" width="100%" height="100%">
-    <!-- Outer boundary paths (lines are black, fillable patches are white) -->
-    <!-- Petals -->
-    <circle cx="330" cy="230" r="80" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <circle cx="470" cy="230" r="80" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <circle cx="330" cy="370" r="80" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <circle cx="470" cy="370" r="80" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <!-- Center -->
-    <circle cx="400" cy="300" r="90" stroke="#000000" stroke-width="12" fill="#ffffff" />
-  </svg>`,
-  house: `<svg viewBox="0 0 800 600" width="100%" height="100%">
-    <!-- Sky background -->
-    <rect x="0" y="0" width="800" height="600" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <!-- Wall -->
-    <rect x="220" y="260" width="360" height="240" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <!-- Roof -->
-    <polygon points="170,260 400,100 630,260" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <!-- Window -->
-    <rect x="270" y="310" width="80" height="80" stroke="#000000" stroke-width="12" fill="#ffffff" />
-    <line x1="310" y1="310" x2="310" y2="390" stroke="#000000" stroke-width="12" />
-    <line x1="270" y1="350" x2="350" y2="350" stroke="#000000" stroke-width="12" />
-    <!-- Door -->
-    <rect x="430" y="340" width="90" height="160" stroke="#000000" stroke-width="12" fill="#ffffff" />
-  </svg>`
-};
-
 export default function App() {
   const [selectedColor, setSelectedColor] = useState(PALETTE[0]);
   const [mode, setMode] = useState('tap'); // 'tap' or 'draw'
-  const [templateKey, setTemplateKey] = useState('flower');
+  const [templateKey, setTemplateKey] = useState('lion');
+  
+  // Gallery states
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
   
   // A toggleable reset key to force canvas re-render and clear colors
   const [resetKey, setResetKey] = useState(0);
@@ -55,6 +32,24 @@ export default function App() {
   const handleClear = () => {
     setResetKey(prev => prev + 1);
   };
+
+  // Helper to extract emoji from template name
+  const getTemplateEmoji = (name) => {
+    const match = name.match(/[\p{Emoji}\u200d]+/gu);
+    return match ? match[0] : '🎨';
+  };
+
+  // Helper to clean name of emoji
+  const getCleanName = (name) => {
+    return name.replace(/[\p{Emoji}\u200d]+/gu, '').trim();
+  };
+
+  const filteredTemplates = Object.entries(TEMPLATES).filter(([key, t]) => {
+    if (selectedCategory === 'all') return true;
+    return t.category === selectedCategory;
+  });
+
+  const activeTemplate = TEMPLATES[templateKey] || TEMPLATES['lion'];
 
   return (
     <div className="coloring-dashboard">
@@ -78,21 +73,13 @@ export default function App() {
         </div>
 
         <div className="control-group">
-          <span className="control-label">Select Page</span>
-          <div className="buttons-row">
-            <button 
-              onClick={() => setTemplateKey('flower')} 
-              className={`mode-btn ${templateKey === 'flower' ? 'active' : ''}`}
-            >
-              🌸 Flower
-            </button>
-            <button 
-              onClick={() => setTemplateKey('house')} 
-              className={`mode-btn ${templateKey === 'house' ? 'active' : ''}`}
-            >
-              🏠 House
-            </button>
-          </div>
+          <span className="control-label">Drawing Page</span>
+          <button 
+            onClick={() => setIsGalleryOpen(true)} 
+            className="open-gallery-btn"
+          >
+            📂 {activeTemplate.name}
+          </button>
         </div>
 
         <div className="control-group">
@@ -106,7 +93,7 @@ export default function App() {
         {mode === 'tap' ? (
           <div key={`tap-${templateKey}-${resetKey}`} className="canvas-frame">
             <TapToFill 
-              svgData={SVG_TEMPLATES[templateKey]} 
+              svgData={activeTemplate.svg} 
               selectedColor={selectedColor} 
             />
           </div>
@@ -134,6 +121,64 @@ export default function App() {
           />
         ))}
       </div>
+
+      {/* Premium Gallery Modal */}
+      {isGalleryOpen && (
+        <div className="gallery-modal" onClick={() => setIsGalleryOpen(false)}>
+          <div className="gallery-content" onClick={(e) => e.stopPropagation()}>
+            <div className="gallery-header">
+              <h2>Choose a Page to Color! 🎨</h2>
+              <button 
+                className="close-gallery-btn" 
+                onClick={() => setIsGalleryOpen(false)}
+                aria-label="Close Gallery"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="category-tabs">
+              <button 
+                onClick={() => setSelectedCategory('all')}
+                className={`category-tab ${selectedCategory === 'all' ? 'active' : ''}`}
+              >
+                🎨 All Pages
+              </button>
+              {Object.entries(CATEGORIES).map(([catKey, cat]) => (
+                <button
+                  key={catKey}
+                  onClick={() => setSelectedCategory(catKey)}
+                  className={`category-tab ${selectedCategory === catKey ? 'active' : ''}`}
+                >
+                  {cat.icon} {cat.name.split(' ')[0]}
+                </button>
+              ))}
+            </div>
+
+            <div className="templates-grid-viewport">
+              <div className="templates-grid">
+                {filteredTemplates.map(([key, t]) => {
+                  const emoji = getTemplateEmoji(t.name);
+                  const cleanName = getCleanName(t.name);
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => {
+                        setTemplateKey(key);
+                        setIsGalleryOpen(false);
+                      }}
+                      className={`template-card ${templateKey === key ? 'active' : ''}`}
+                    >
+                      <span className="card-emoji">{emoji}</span>
+                      <span className="card-name">{cleanName}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

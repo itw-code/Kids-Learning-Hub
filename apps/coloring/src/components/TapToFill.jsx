@@ -3,15 +3,14 @@ import React from 'react';
 export default function TapToFill({ svgData, selectedColor }) {
   const handleSvgClick = (e) => {
     const target = e.target;
-    // We only want to fill paths, polygons, circles, ellipses, rects
     const fillableTags = ['path', 'polygon', 'circle', 'ellipse', 'rect'];
     if (fillableTags.includes(target.tagName.toLowerCase())) {
-      // Avoid filling black line-art outlines or borders
-      const stroke = target.getAttribute('stroke');
+      const fill = target.getAttribute('fill');
       const id = target.getAttribute('id');
+      const isFillable = target.classList.contains('fillable');
       
-      // If it's a boundary outline path, do not fill it
-      if (stroke === '#000000' || stroke === 'black' || id === 'outline') {
+      // Skip if it's explicitly non-fillable or not marked as fillable in templates
+      if (fill === 'none' || id === 'outline' || !isFillable) {
         return;
       }
       
