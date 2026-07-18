@@ -8,11 +8,13 @@ const precachedAssets = (injectManifestList || []).map((entry) => {
   return typeof entry === 'string' ? entry : entry.url;
 });
 
-// Manual entry points for legacy sub-apps
 const MANUAL_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
+  '/apps/numbers/',
+  '/apps/spelling/',
+  '/apps/shapes/',
   '/apps/coloring/'
 ];
 

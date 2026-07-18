@@ -30,6 +30,17 @@ export const LeafSortGame: React.FC = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const basketRefs = useRef<Record<string, Konva.Rect>>({});
+  const stageRef = useRef<Konva.Stage | null>(null);
+
+  // Clean up Konva stage reference on unmount to prevent iOS memory leaks
+  useEffect(() => {
+    return () => {
+      if (stageRef.current) {
+        stageRef.current.destroy();
+        stageRef.current = null;
+      }
+    };
+  }, []);
   
   // Custom image loader to avoid external dependencies
   const [leafImages, setLeafImages] = useState<Record<string, HTMLImageElement>>({});
@@ -284,7 +295,7 @@ export const LeafSortGame: React.FC = () => {
         )}
 
         {imagesLoaded ? (
-          <Stage width={dimensions.width} height={dimensions.height}>
+          <Stage ref={stageRef} width={dimensions.width} height={dimensions.height}>
             <Layer>
               {/* Render Baskets */}
               {baskets.map((basket) => (

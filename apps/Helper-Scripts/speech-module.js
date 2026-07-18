@@ -10,8 +10,38 @@
 window.voiceList = [];
 window.preferredVoice = null;
 
+// Phonetic map for Indonesian single letter sounds
+const INDONESIAN_PHONETIC_MAP = {
+    'A': 'ah',
+    'B': 'beh',
+    'C': 'ceh',
+    'D': 'deh',
+    'E': 'eh',
+    'F': 'ef',
+    'G': 'geh',
+    'H': 'hah',
+    'I': 'ih',
+    'J': 'jeh',
+    'K': 'kah',
+    'L': 'el',
+    'M': 'em',
+    'N': 'en',
+    'O': 'oh',
+    'P': 'peh',
+    'Q': 'ki',
+    'R': 'er',
+    'S': 'es',
+    'T': 'teh',
+    'U': 'uh',
+    'V': 've',
+    'W': 'we',
+    'X': 'eks',
+    'Y': 'ye',
+    'Z': 'zet'
+};
+
 /**
- * Loads voices and picks the best "human-sounding" one for the platform.
+ * Loads voices and picks the best "human-sounding" Indonesian one (with English fallback).
  */
 window.loadVoices = function() {
     if (window.voiceList.length > 0) return;
@@ -27,7 +57,27 @@ window.loadVoices = function() {
             window.preferredVoice = window.voiceList.find(v => v.name === savedName);
         }
 
-        // 2. Windows "Natural" Voices
+        // 2. High-Quality Indonesian Voice Selection
+        if (!window.preferredVoice) {
+            const indonesianVoices = window.voiceList.filter(v => v.lang.startsWith('id'));
+            
+            // Try Online natural or Google Indonesian voices first
+            window.preferredVoice = indonesianVoices.find(v => 
+                v.name.includes('Natural') || v.name.includes('Online') || v.name.includes('Google')
+            );
+            
+            // Try Damayanti (iOS/macOS native Indonesian voice)
+            if (!window.preferredVoice) {
+                window.preferredVoice = indonesianVoices.find(v => v.name.includes('Damayanti'));
+            }
+            
+            // Default to any Indonesian voice if found
+            if (!window.preferredVoice) {
+                window.preferredVoice = indonesianVoices[0];
+            }
+        }
+
+        // 3. English Fallback (Windows Natural / Google)
         if (!window.preferredVoice) {
             const winHighQuality = ['Natural', 'Online', 'Google US English'];
             window.preferredVoice = window.voiceList.find(v => 
@@ -36,7 +86,7 @@ window.loadVoices = function() {
             );
         }
 
-        // 3. iOS High-Quality Favorites
+        // 4. English Fallback (iOS Favorites)
         if (!window.preferredVoice) {
             const iosFavorites = ['Samantha', 'Daniel', 'Karen', 'Moira', 'Rishi', 'Tessa'];
             window.preferredVoice = window.voiceList.find(v => 
@@ -44,20 +94,9 @@ window.loadVoices = function() {
             );
         }
 
-        // 4. iOS "Enhanced" / "Siri"
+        // 5. General Fallbacks
         if (!window.preferredVoice) {
-            window.preferredVoice = window.voiceList.find(v => 
-                v.lang.startsWith('en') && 
-                (v.name.includes('Enhanced') || v.name.includes('Siri'))
-            );
-        }
-
-        // 5. Fallbacks
-        if (!window.preferredVoice) {
-            window.preferredVoice = window.voiceList.find(v => v.lang === 'en-US' && v.default);
-        }
-        if (!window.preferredVoice) {
-            window.preferredVoice = window.voiceList.find(v => v.lang === 'en-US');
+            window.preferredVoice = window.voiceList.find(v => v.lang.startsWith('en'));
         }
     }
 };
@@ -66,7 +105,7 @@ window.loadVoices();
 window.speechSynthesis.onvoiceschanged = window.loadVoices;
 
 /**
- * Speaks text with "Audio Ducking" for music and platform fixes.
+ * Speaks text with "Audio Ducking" for music, platform fixes, and single-letter Indonesian phonetic substitution.
  */
 window.speakText = function(text, onEndCallback) {
     window.speechSynthesis.cancel();
@@ -88,28 +127,37 @@ window.speakText = function(text, onEndCallback) {
         window.speechSynthesis.speak(primer);
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    // --- 3. PHONETIC CONVERSION FOR BAHASA INDONESIA ---
+    let processedText = text;
+    if (typeof text === 'string' && text.trim().length === 1) {
+        const letter = text.trim().toUpperCase();
+        if (INDONESIAN_PHONETIC_MAP[letter]) {
+            processedText = INDONESIAN_PHONETIC_MAP[letter];
+        }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(processedText);
 
     // iOS Pitch/Rate Adjustments
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isIOS) {
-        utterance.rate = 1.05; 
+        utterance.rate = 1.0; 
         utterance.pitch = 1.1; 
     } else {
-        utterance.rate = 0.9; 
+        utterance.rate = 0.85; 
         utterance.pitch = 1.0;
     }
 
-    // Voice Selection
+    // Voice Selection & Language Enforcement
     if (window.preferredVoice) {
         utterance.voice = window.preferredVoice;
         utterance.lang = window.preferredVoice.lang; 
     } else {
-        utterance.lang = 'en-US';
+        utterance.lang = 'id-ID'; // Force Indonesian phonetic synthesis
     }
 
-    // --- 3. RESTORE MUSIC ON END ---
+    // --- 4. RESTORE MUSIC ON END ---
     const restoreMusic = () => {
         if (bgMusic && !bgMusic.paused) {
             bgMusic.volume = 0.5; // Restore to 50%
@@ -128,13 +176,22 @@ window.speakText = function(text, onEndCallback) {
 ;(function globalUnlockSpeech() {
   async function resumeAudio() {
     try {
-      const context = (window.__unlockAudioContext && window.__unlockAudioContext.context) || new (window.AudioContext || window.webkitAudioContext)();
-      if (context.state === 'suspended') await context.resume();
+      // Coordinate with parent/root AudioContext if already unlocked
+      const context = window.__audioContext || 
+                      (window.__unlockAudioContext && window.__unlockAudioContext.context) || 
+                      new (window.AudioContext || window.webkitAudioContext)();
+      
+      if (context.state === 'suspended') {
+        await context.resume();
+      }
+      
       const buffer = context.createBuffer(1, 1, context.sampleRate);
       const src = context.createBufferSource();
       src.buffer = buffer;
       src.connect(context.destination);
       src.start(0);
+
+      window.__audioContext = context;
       return true;
     } catch (e) { return false; }
   }
@@ -144,6 +201,7 @@ window.speakText = function(text, onEndCallback) {
       if (!('speechSynthesis' in window)) { resolve(false); return; }
       const utter = new SpeechSynthesisUtterance(' ');
       utter.volume = 0;
+      utter.lang = 'id-ID';
       utter.onend = () => resolve(true);
       window.speechSynthesis.speak(utter);
       setTimeout(() => resolve(true), 500);

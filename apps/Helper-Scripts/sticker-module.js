@@ -16,11 +16,52 @@
         'night_owl': { name: 'Night Owl', icon: '🌙', color: '#3F51B5', desc: 'Played after 7 PM!', speech: 'Hoo hoo! Night Owl!' }
     };
 
-    // Helper to get data
-    function getInventory() {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+    // Support multiple child profiles storing an array of profiles in LocalStorage
+    function getProfiles() {
+        const data = localStorage.getItem('klh_sticker_profiles');
+        if (!data) {
+            const defaultProfiles = [{ id: 'default', name: 'Anak', stickers: [] }];
+            localStorage.setItem('klh_sticker_profiles', JSON.stringify(defaultProfiles));
+            return defaultProfiles;
+        }
+        return JSON.parse(data);
     }
+
+    function getActiveProfileId() {
+        // Fallback to active profile id from general store
+        const generalStore = localStorage.getItem('klh_profile_progress');
+        if (generalStore) {
+            try {
+                const parsed = JSON.parse(generalStore);
+                if (parsed && parsed.state && parsed.state.activeProfileId) {
+                    return parsed.state.activeProfileId;
+                }
+            } catch (e) {}
+        }
+        return localStorage.getItem('klh_active_profile_id') || 'default';
+    }
+
+    function getInventory() {
+        const activeId = getActiveProfileId();
+        const profiles = getProfiles();
+        const profile = profiles.find(p => p.id === activeId);
+        return profile ? profile.stickers : [];
+    }
+
+    // Parent Gate: generates a random math question to prevent child access
+    window.ParentGate = function(callback) {
+        const num1 = Math.floor(Math.random() * 9) + 2; // 2-10
+        const num2 = Math.floor(Math.random() * 9) + 2; // 2-10
+        const answer = num1 + num2;
+        
+        const response = prompt(`GERBANG ORANG TUA: Hanya untuk orang tua! Berapa ${num1} + ${num2}?`);
+        
+        if (response !== null && parseInt(response.trim(), 10) === answer) {
+            callback();
+        } else if (response !== null) {
+            alert('Jawaban salah! Akses ditolak.');
+        }
+    };
 
     // Create and show a popup notification dynamically
     function showNotification(stickerId) {
@@ -77,16 +118,71 @@
     // Public API
     window.StickerManager = {
         awardSticker: function(stickerId) {
-            const inv = getInventory();
-            if (!inv.includes(stickerId)) {
-                inv.push(stickerId);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(inv));
+            const activeId = getActiveProfileId();
+            const profiles = getProfiles();
+            let profile = profiles.find(p => p.id === activeId);
+            if (!profile) {
+                profile = { id: activeId, name: 'Anak', stickers: [] };
+                profiles.push(profile);
+            }
+            if (!profile.stickers.includes(stickerId)) {
+                profile.stickers.push(stickerId);
+                localStorage.setItem('klh_sticker_profiles', JSON.stringify(profiles));
                 showNotification(stickerId);
+
+                // Keep Zustand store in sync as well
+                const generalStore = localStorage.getItem('klh_profile_progress');
+                if (generalStore) {
+                    try {
+                        const parsed = JSON.parse(generalStore);
+                        if (parsed && parsed.state) {
+                            if (!parsed.state.stickers) parsed.state.stickers = [];
+                            if (!parsed.state.stickers.includes(stickerId)) {
+                                parsed.state.stickers.push(stickerId);
+                                localStorage.setItem('klh_profile_progress', JSON.stringify(parsed));
+                            }
+                        }
+                    } catch(e) {}
+                }
+
+                window.dispatchEvent(new Event('storage'));
                 return true;
             }
             return false;
         },
         getInventory: getInventory,
+        getProfiles: getProfiles,
+        getActiveProfileId: getActiveProfileId,
+        setActiveProfileId: function(profileId) {
+            localStorage.setItem('klh_active_profile_id', profileId);
+            window.dispatchEvent(new Event('storage'));
+        },
+        resetInventory: function() {
+            window.ParentGate(() => {
+                const activeId = getActiveProfileId();
+                const profiles = getProfiles();
+                const profile = profiles.find(p => p.id === activeId);
+                if (profile) {
+                    profile.stickers = [];
+                    localStorage.setItem('klh_sticker_profiles', JSON.stringify(profiles));
+
+                    // Keep Zustand store in sync
+                    const generalStore = localStorage.getItem('klh_profile_progress');
+                    if (generalStore) {
+                        try {
+                            const parsed = JSON.parse(generalStore);
+                            if (parsed && parsed.state) {
+                                parsed.state.stickers = [];
+                                localStorage.setItem('klh_profile_progress', JSON.stringify(parsed));
+                            }
+                        } catch(e) {}
+                    }
+
+                    alert('Semua stiker telah dihapus untuk profil ini!');
+                    window.dispatchEvent(new Event('storage'));
+                }
+            });
+        },
         getStickerData: () => STICKERS
     };
 })();

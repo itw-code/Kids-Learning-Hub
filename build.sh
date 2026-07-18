@@ -40,7 +40,15 @@ if [ -d "assets" ]; then
   cp -r assets dist/
 fi
 
-# Legacy baseline sub-apps (Alphabet, Numbers, Spelling, Shapes) are now native React/TS games inside the root app and no longer copied.
+# Copy legacy baseline sub-apps
+echo "📁 Copying Numbers game..."
+cp -r apps/numbers dist/apps/
+
+echo "📁 Copying Spelling game..."
+cp -r apps/spelling dist/apps/
+
+echo "📁 Copying Shapes game..."
+cp -r apps/shapes dist/apps/
 
 echo "📁 Copying global Helper-Scripts..."
 cp -r apps/Helper-Scripts dist/apps/

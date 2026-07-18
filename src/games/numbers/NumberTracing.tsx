@@ -26,6 +26,17 @@ export const NumberTracing: React.FC = () => {
   const { speak } = useSpeechSynthesis();
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<any>(null);
+
+  // Clean up Konva stage reference on unmount to prevent iOS memory leaks
+  useEffect(() => {
+    return () => {
+      if (stageRef.current) {
+        stageRef.current.destroy();
+        stageRef.current = null;
+      }
+    };
+  }, []);
   
   // Apply iPad scrolling prevention hook
   usePreventIpadGestures(containerRef);
@@ -203,6 +214,7 @@ export const NumberTracing: React.FC = () => {
         style={{ touchAction: 'none' }}
       >
         <Stage
+          ref={stageRef}
           width={dimensions.width}
           height={dimensions.height}
           onMouseDown={handlePointerDown}

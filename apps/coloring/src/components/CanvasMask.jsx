@@ -6,6 +6,37 @@ import { playColorSound } from '../utils/audio';
 
 const ALL_TEMPLATES = { ...TEMPLATES, ...EXTRA_TEMPLATES };
 
+const prepareSvgString = (svgString) => {
+  if (!svgString) return '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  
+  const elements = svgEl.querySelectorAll('path, polygon, circle, ellipse, rect');
+  
+  elements.forEach((el) => {
+    const tagName = el.tagName.toLowerCase();
+    const fill = el.getAttribute('fill');
+    const stroke = el.getAttribute('stroke');
+    const id = el.getAttribute('id');
+    const className = el.getAttribute('class') || '';
+    
+    // Check if it's the full-size background rect
+    const isBackground = tagName === 'rect' && 
+      (el.getAttribute('width') === '800' || el.getAttribute('width') === '100%') &&
+      (el.getAttribute('height') === '600' || el.getAttribute('height') === '100%') &&
+      (!stroke || stroke === 'none');
+      
+    const isOutline = id === 'outline' || className.includes('outline') || fill === 'none';
+    
+    if (!isBackground && !isOutline) {
+      el.classList.add('fillable');
+    }
+  });
+  
+  return new XMLSerializer().serializeToString(doc);
+};
+
 // Helper to generate distinct RGB values based on index (for ID map)
 const getIdColor = (index) => {
   const r = ((index * 37) % 7) * 35 + 40;
@@ -60,7 +91,7 @@ export default function CanvasMask({
     const template = ALL_TEMPLATES[templateKey];
     if (!template) return;
 
-    const rawSvg = template.svg;
+    const rawSvg = prepareSvgString(template.svg);
     const idMapSvg = generateIdMapSvg(rawSvg);
     const outlineSvg = generateOutlineSvg(rawSvg);
 

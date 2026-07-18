@@ -1,6 +1,37 @@
 import React, { useRef, useEffect } from 'react';
 import { playColorSound } from '../utils/audio';
 
+const prepareSvgString = (svgString) => {
+  if (!svgString) return '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  
+  const elements = svgEl.querySelectorAll('path, polygon, circle, ellipse, rect');
+  
+  elements.forEach((el) => {
+    const tagName = el.tagName.toLowerCase();
+    const fill = el.getAttribute('fill');
+    const stroke = el.getAttribute('stroke');
+    const id = el.getAttribute('id');
+    const className = el.getAttribute('class') || '';
+    
+    // Check if it's the full-size background rect
+    const isBackground = tagName === 'rect' && 
+      (el.getAttribute('width') === '800' || el.getAttribute('width') === '100%') &&
+      (el.getAttribute('height') === '600' || el.getAttribute('height') === '100%') &&
+      (!stroke || stroke === 'none');
+      
+    const isOutline = id === 'outline' || className.includes('outline') || fill === 'none';
+    
+    if (!isBackground && !isOutline) {
+      el.classList.add('fillable');
+    }
+  });
+  
+  return new XMLSerializer().serializeToString(doc);
+};
+
 export default function TapToFill({ svgData, selectedColor }) {
   const containerRef = useRef(null);
   
@@ -14,7 +45,8 @@ export default function TapToFill({ svgData, selectedColor }) {
   // Inject the SVG and local gradient definitions when svgData changes
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.innerHTML = svgData;
+      const processedSvg = prepareSvgString(svgData);
+      containerRef.current.innerHTML = processedSvg;
       const svg = containerRef.current.querySelector('svg');
       if (svg) {
         // Dynamically add a defs block containing premium gradients
