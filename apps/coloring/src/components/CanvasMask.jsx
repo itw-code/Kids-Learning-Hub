@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { TEMPLATES } from '../templates';
+import { drawStroke, drawStamp, BRUSH_TYPES, STAMP_SHAPES } from '../utils/brushEngine';
 import { playColorSound } from '../utils/audio';
 
-// Helper to generate distinct RGB values based on index
+// Helper to generate distinct RGB values based on index (for ID map)
 const getIdColor = (index) => {
   const r = ((index * 37) % 7) * 35 + 40;
   const g = ((index * 59) % 7) * 35 + 40;
@@ -10,49 +11,42 @@ const getIdColor = (index) => {
   return [r, g, b];
 };
 
-// Generates an SVG string with unique fill colors for fillable paths
 const generateIdMapSvg = (svgString) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svgString, 'image/svg+xml');
   const svgEl = doc.documentElement;
-  
-  const fillables = svgEl.querySelectorAll('.fillable');
-  fillables.forEach((el, index) => {
+  svgEl.querySelectorAll('.fillable').forEach((el, index) => {
     const [r, g, b] = getIdColor(index);
     const colorHex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
     el.setAttribute('fill', colorHex);
   });
-  
-  const serializer = new XMLSerializer();
-  return serializer.serializeToString(doc);
+  return new XMLSerializer().serializeToString(doc);
 };
 
-// Generates an SVG string with fill="none" to isolate outlines
 const generateOutlineSvg = (svgString) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svgString, 'image/svg+xml');
-  const svgEl = doc.documentElement;
-  
-  const fillables = svgEl.querySelectorAll('.fillable');
-  fillables.forEach(el => {
-    el.setAttribute('fill', 'none');
-  });
-  
-  const serializer = new XMLSerializer();
-  return serializer.serializeToString(doc);
+  doc.documentElement.querySelectorAll('.fillable').forEach(el => el.setAttribute('fill', 'none'));
+  return new XMLSerializer().serializeToString(doc);
 };
 
-export default function CanvasMask({ templateKey = 'flower', selectedColor, brushSize = 18 }) {
+export default function CanvasMask({
+  templateKey = 'flower',
+  selectedColor,
+  brushSize = 18,
+  brushType = 'crayon',
+  stampShape = 'star',
+}) {
   const canvasRef = useRef(null);
   const idCanvasRef = useRef(null);
   const maskCanvasRef = useRef(null);
   const tempCanvasRef = useRef(null);
   const outlineImageRef = useRef(null);
-  
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [activeColorId, setActiveColorId] = useState(null);
 
-  // Initialize templates on canvases
+  const [isDrawing, setIsDrawing] = useState(false);
+  const prevPosRef = useRef({ x: 0, y: 0 });
+
+  // ---- Canvas setup on template change ----
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -67,188 +61,125 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
     const idMapSvg = generateIdMapSvg(rawSvg);
     const outlineSvg = generateOutlineSvg(rawSvg);
 
-    // Render visible SVG template (white background + black lines)
-    const visibleImg = new Image();
-    const visibleBlob = new Blob([rawSvg], { type: 'image/svg+xml;charset=utf-8' });
-    const visibleUrl = URL.createObjectURL(visibleBlob);
-    visibleImg.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(visibleImg, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(visibleUrl);
+    const loadSvgToCanvas = (svgStr, targetCtx, targetCanvas, onLoad) => {
+      const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+        targetCtx.drawImage(img, 0, 0, targetCanvas.width, targetCanvas.height);
+        URL.revokeObjectURL(url);
+        if (onLoad) onLoad(img);
+      };
+      img.src = url;
     };
-    visibleImg.src = visibleUrl;
 
-    // Render ID Map SVG to hidden canvas
-    const idImg = new Image();
-    const idBlob = new Blob([idMapSvg], { type: 'image/svg+xml;charset=utf-8' });
-    const idUrl = URL.createObjectURL(idBlob);
-    idImg.onload = () => {
-      idCtx.clearRect(0, 0, idCanvas.width, idCanvas.height);
-      idCtx.drawImage(idImg, 0, 0, idCanvas.width, idCanvas.height);
-      URL.revokeObjectURL(idUrl);
-    };
-    idImg.src = idUrl;
-
-    // Preload outline image for synchronous drawing on top
-    const outlineImg = new Image();
-    const outlineBlob = new Blob([outlineSvg], { type: 'image/svg+xml;charset=utf-8' });
-    const outlineUrl = URL.createObjectURL(outlineBlob);
-    outlineImg.onload = () => {
-      outlineImageRef.current = outlineImg;
-      URL.revokeObjectURL(outlineUrl);
-    };
-    outlineImg.src = outlineUrl;
-
+    loadSvgToCanvas(rawSvg, ctx, canvas);
+    loadSvgToCanvas(idMapSvg, idCtx, idCanvas);
+    loadSvgToCanvas(outlineSvg, null, null, (img) => { outlineImageRef.current = img; });
   }, [templateKey]);
 
-  const getPixelRGB = (ctx, x, y) => {
-    const pixel = ctx.getImageData(x, y, 1, 1).data;
-    return [pixel[0], pixel[1], pixel[2]];
-  };
-
-  const createMaskForRegion = (idCtx, targetR, targetG, targetB) => {
+  // ---- ID map region mask ----
+  const createMaskForRegion = useCallback((idCtx, targetR, targetG, targetB) => {
     const maskCanvas = maskCanvasRef.current;
     const maskCtx = maskCanvas.getContext('2d');
-    const width = maskCanvas.width;
-    const height = maskCanvas.height;
-    
+    const { width, height } = maskCanvas;
     maskCtx.clearRect(0, 0, width, height);
 
     const idData = idCtx.getImageData(0, 0, width, height);
-    const idPixels = idData.data;
-    
     const maskData = maskCtx.createImageData(width, height);
-    const maskPixels = maskData.data;
-
-    // Tolerance to handle canvas anti-aliasing edges
     const threshold = 18;
 
-    for (let i = 0; i < idPixels.length; i += 4) {
-      const r = idPixels[i];
-      const g = idPixels[i + 1];
-      const b = idPixels[i + 2];
-      
-      const match = 
-        Math.abs(r - targetR) <= threshold &&
-        Math.abs(g - targetG) <= threshold &&
-        Math.abs(b - targetB) <= threshold;
-      
+    for (let i = 0; i < idData.data.length; i += 4) {
+      const match =
+        Math.abs(idData.data[i]     - targetR) <= threshold &&
+        Math.abs(idData.data[i + 1] - targetG) <= threshold &&
+        Math.abs(idData.data[i + 2] - targetB) <= threshold;
       if (match) {
-        maskPixels[i] = 0;
-        maskPixels[i + 1] = 0;
-        maskPixels[i + 2] = 0;
-        maskPixels[i + 3] = 255;
-      } else {
-        maskPixels[i + 3] = 0;
+        maskData.data[i] = maskData.data[i + 1] = maskData.data[i + 2] = 0;
+        maskData.data[i + 3] = 255;
       }
     }
-    
     maskCtx.putImageData(maskData, 0, 0);
-  };
+  }, []);
 
-  const getEventCoordinates = (e) => {
+  // ---- Coordinate normalisation ----
+  const getCoords = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    
-    let clientX, clientY;
-    if (e.touches && e.touches.length > 0) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    const x = ((clientX - rect.left) / rect.width) * canvas.width;
-    const y = ((clientY - rect.top) / rect.height) * canvas.height;
-    return { x, y };
+    const { clientX, clientY } = e.touches ? e.touches[0] : e;
+    return {
+      x: ((clientX - rect.left) / rect.width)  * canvas.width,
+      y: ((clientY - rect.top)  / rect.height) * canvas.height,
+    };
   };
 
+  // ---- Stamp handler (tap-only) ----
+  const handleStamp = (e) => {
+    const { x, y } = getCoords(e);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    playColorSound();
+    ctx.save();
+    drawStamp(ctx, x, y, selectedColor, brushSize, stampShape);
+    ctx.restore();
+    // Redraw outlines on top
+    if (outlineImageRef.current) {
+      ctx.drawImage(outlineImageRef.current, 0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  // ---- Draw start ----
   const startDrawing = (e) => {
-    const { x, y } = getEventCoordinates(e);
+    if (brushType === 'fill' || brushType === 'stamp') return; // handled separately
+    const { x, y } = getCoords(e);
     const idCtx = idCanvasRef.current.getContext('2d');
-    
-    const [r, g, b] = getPixelRGB(idCtx, x, y);
-    
-    // Ignore pure black outlines (#000000)
+    const [r, g, b] = (() => {
+      const px = idCtx.getImageData(Math.round(x), Math.round(y), 1, 1).data;
+      return [px[0], px[1], px[2]];
+    })();
     const isOutline = r < 18 && g < 18 && b < 18;
-
     if (!isOutline) {
-      setActiveColorId([r, g, b]);
       createMaskForRegion(idCtx, r, g, b);
-      
-      const tempCanvas = tempCanvasRef.current;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-      tempCtx.beginPath();
-      tempCtx.moveTo(x, y);
-      
+      const tempCtx = tempCanvasRef.current.getContext('2d');
+      tempCtx.clearRect(0, 0, tempCanvasRef.current.width, tempCanvasRef.current.height);
+      prevPosRef.current = { x, y };
       setIsDrawing(true);
-      playColorSound(); // Sound FX on draw start
+      playColorSound();
     }
   };
 
+  // ---- Drawing move ----
   const draw = (e) => {
     if (!isDrawing) return;
-    const { x, y } = getEventCoordinates(e);
+    const { x, y } = getCoords(e);
+    const { x: prevX, y: prevY } = prevPosRef.current;
 
     const tempCanvas = tempCanvasRef.current;
     const tempCtx = tempCanvas.getContext('2d');
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
-    // Draw brush line segment on temp canvas
-    tempCtx.lineTo(x, y);
-    
-    // Gradient Stroke Resolution
-    let strokeStyle = selectedColor;
-    if (selectedColor.startsWith('url(#grad-')) {
-      const gradId = selectedColor.substring(5, selectedColor.length - 1);
-      const grad = tempCtx.createLinearGradient(x - brushSize, y - brushSize, x + brushSize, y + brushSize);
-      if (gradId === 'grad-sunset') {
-        grad.addColorStop(0, '#ff5f6d'); grad.addColorStop(1, '#ffc371');
-      } else if (gradId === 'grad-ocean') {
-        grad.addColorStop(0, '#2193b0'); grad.addColorStop(1, '#6dd5ed');
-      } else if (gradId === 'grad-rainbow') {
-        grad.addColorStop(0, '#ee9ca7'); grad.addColorStop(1, '#ffdde1');
-      } else if (gradId === 'grad-forest') {
-        grad.addColorStop(0, '#11998e'); grad.addColorStop(1, '#38ef7d');
-      } else if (gradId === 'grad-magic') {
-        grad.addColorStop(0, '#8a2387'); grad.addColorStop(1, '#e94057');
-      } else if (gradId === 'grad-cotton') {
-        grad.addColorStop(0, '#ff758c'); grad.addColorStop(1, '#ff7eb3');
-      }
-      strokeStyle = grad;
-    }
 
-    tempCtx.strokeStyle = strokeStyle;
-    tempCtx.lineWidth = brushSize;
-    tempCtx.lineCap = 'round';
-    tempCtx.lineJoin = 'round';
-    tempCtx.stroke();
+    // Draw onto temp canvas using brush engine
+    drawStroke(tempCtx, prevX, prevY, x, y, selectedColor, brushSize, brushType);
 
-    // Clip onto main canvas
-    ctx.save();
-    
-    const scratchCanvas = document.createElement('canvas');
-    scratchCanvas.width = canvas.width;
-    scratchCanvas.height = canvas.height;
-    const scratchCtx = scratchCanvas.getContext('2d');
-    
+    // Clip temp canvas through mask onto main canvas
+    const scratch = document.createElement('canvas');
+    scratch.width = canvas.width;
+    scratch.height = canvas.height;
+    const scratchCtx = scratch.getContext('2d');
     scratchCtx.drawImage(tempCanvas, 0, 0);
     scratchCtx.globalCompositeOperation = 'destination-in';
     scratchCtx.drawImage(maskCanvasRef.current, 0, 0);
-    
-    ctx.drawImage(scratchCanvas, 0, 0);
-    ctx.restore();
+    ctx.drawImage(scratch, 0, 0);
+
+    prevPosRef.current = { x, y };
   };
 
+  // ---- Drawing end ----
   const stopDrawing = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    setActiveColorId(null);
-    
-    // Redraw template outlines to cover overlapping brush edge pixels
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (outlineImageRef.current) {
@@ -256,19 +187,24 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
     }
   };
 
+  const isStampOrFill = brushType === 'stamp' || brushType === 'fill';
+
   return (
-    <div className="canvas-wrapper" style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      className="canvas-wrapper"
+      style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+    >
       <canvas
         ref={canvasRef}
         width={800}
         height={600}
-        onTouchStart={startDrawing}
-        onTouchMove={draw}
-        onTouchEnd={stopDrawing}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}
+        onTouchStart={isStampOrFill ? (brushType === 'stamp' ? handleStamp : undefined) : startDrawing}
+        onTouchMove={isStampOrFill ? undefined : draw}
+        onTouchEnd={isStampOrFill ? undefined : stopDrawing}
+        onMouseDown={isStampOrFill ? (brushType === 'stamp' ? handleStamp : undefined) : startDrawing}
+        onMouseMove={isStampOrFill ? undefined : draw}
+        onMouseUp={isStampOrFill ? undefined : stopDrawing}
+        onMouseLeave={isStampOrFill ? undefined : stopDrawing}
         style={{
           touchAction: 'none',
           boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
@@ -276,10 +212,10 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
           maxWidth: '100%',
           maxHeight: '100%',
           backgroundColor: '#fff',
-          cursor: 'crosshair'
+          cursor: BRUSH_TYPES[brushType]?.cursor || 'crosshair',
         }}
       />
-      <canvas ref={idCanvasRef} width={800} height={600} style={{ display: 'none' }} />
+      <canvas ref={idCanvasRef}   width={800} height={600} style={{ display: 'none' }} />
       <canvas ref={maskCanvasRef} width={800} height={600} style={{ display: 'none' }} />
       <canvas ref={tempCanvasRef} width={800} height={600} style={{ display: 'none' }} />
     </div>

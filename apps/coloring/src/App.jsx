@@ -2,253 +2,220 @@ import React, { useState } from 'react';
 import TapToFill from './components/TapToFill';
 import CanvasMask from './components/CanvasMask';
 import { CATEGORIES, TEMPLATES } from './templates';
+import { BRUSH_TYPES, STAMP_SHAPES } from './utils/brushEngine';
 import './App.css';
 
-// Child-friendly palettes
+// ---- Color Palettes ----
 const SOLID_COLORS = [
-  '#ff595e', // Red
-  '#ff924c', // Orange
-  '#ffca3a', // Yellow
-  '#8ac926', // Green
-  '#36827f', // Teal
-  '#1982c4', // Blue
-  '#6a4c93', // Purple
-  '#ff70a6', // Pink
-  '#8b5a2b', // Brown
-  '#000000', // Black
-  '#ffffff', // White (eraser)
+  '#ff595e', '#ff924c', '#ffca3a', '#8ac926',
+  '#36827f', '#1982c4', '#6a4c93', '#ff70a6',
+  '#8b5a2b', '#000000', '#ffffff',
 ];
 
 const PASTEL_COLORS = [
-  '#ffadad', // Soft Red
-  '#ffd6a5', // Soft Orange
-  '#fdffb6', // Soft Yellow
-  '#caffbf', // Soft Green
-  '#9bf6ff', // Soft Cyan
-  '#a0c4ff', // Soft Blue
-  '#bdb2ff', // Soft Purple
-  '#ffc6ff', // Soft Pink
+  '#ffadad', '#ffd6a5', '#fdffb6', '#caffbf',
+  '#9bf6ff', '#a0c4ff', '#bdb2ff', '#ffc6ff',
 ];
 
 const GRADIENTS = [
-  { name: 'Sunset 🌅', value: 'url(#grad-sunset)' },
-  { name: 'Ocean 🌊', value: 'url(#grad-ocean)' },
+  { name: 'Sunset 🌅',  value: 'url(#grad-sunset)' },
+  { name: 'Ocean 🌊',   value: 'url(#grad-ocean)'  },
   { name: 'Rainbow 🌈', value: 'url(#grad-rainbow)' },
-  { name: 'Forest 🌳', value: 'url(#grad-forest)' },
-  { name: 'Magic 🔮', value: 'url(#grad-magic)' },
-  { name: 'Cotton 🍬', value: 'url(#grad-cotton)' },
+  { name: 'Forest 🌳',  value: 'url(#grad-forest)' },
+  { name: 'Magic 🔮',   value: 'url(#grad-magic)'  },
+  { name: 'Cotton 🍬',  value: 'url(#grad-cotton)' },
 ];
 
+// Brush tool order for the toolbar
+const BRUSH_ORDER = ['fill', 'crayon', 'marker', 'pencil', 'watercolor', 'glitter', 'eraser', 'stamp'];
+
 export default function App() {
-  const [selectedColor, setSelectedColor] = useState(SOLID_COLORS[0]);
-  const [mode, setMode] = useState('tap'); // 'tap' or 'draw'
-  const [templateKey, setTemplateKey] = useState('lion');
-  
-  // Gallery states
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [selectedColor, setSelectedColor]     = useState(SOLID_COLORS[0]);
+  const [activePaletteTab, setActivePalette]  = useState('solid');
+  const [brushType, setBrushType]             = useState('crayon');
+  const [brushSize, setBrushSize]             = useState(18);
+  const [stampShape, setStampShape]           = useState('star');
+  const [templateKey, setTemplateKey]         = useState('lion');
+  const [isGalleryOpen, setIsGalleryOpen]     = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
-  // A toggleable reset key to force canvas re-render and clear colors
-  const [resetKey, setResetKey] = useState(0);
+  const [resetKey, setResetKey]               = useState(0);
 
-  // Expanded customization states
-  const [activePaletteTab, setActivePaletteTab] = useState('solid'); // 'solid' | 'pastel' | 'gradient'
-  const [brushSize, setBrushSize] = useState(18); // 10 | 18 | 28
+  // Derived: fill mode uses TapToFill SVG; everything else uses CanvasMask
+  const isFillMode = brushType === 'fill';
 
-  const handleClear = () => {
-    setResetKey(prev => prev + 1);
-  };
-
-  const handlePaletteTabChange = (tab) => {
-    setActivePaletteTab(tab);
-    if (tab === 'solid') setSelectedColor(SOLID_COLORS[0]);
+  const handlePaletteTab = (tab) => {
+    setActivePalette(tab);
+    if (tab === 'solid')    setSelectedColor(SOLID_COLORS[0]);
     else if (tab === 'pastel') setSelectedColor(PASTEL_COLORS[0]);
-    else if (tab === 'gradient') setSelectedColor(GRADIENTS[0].value);
+    else                    setSelectedColor(GRADIENTS[0].value);
   };
 
-  // Helper to extract emoji from template name
-  const getTemplateEmoji = (name) => {
-    const match = name.match(/[\p{Emoji}\u200d]+/gu);
-    return match ? match[0] : '🎨';
-  };
-
-  // Helper to clean name of emoji
-  const getCleanName = (name) => {
-    return name.replace(/[\p{Emoji}\u200d]+/gu, '').trim();
-  };
-
-  const getPaletteStyle = (color) => {
-    if (typeof color === 'string' && color.startsWith('url(#grad-')) {
-      const gradId = color.substring(5, color.length - 1);
-      if (gradId === 'grad-sunset') return { background: 'linear-gradient(135deg, #ff5f6d, #ffc371)', border: 'none' };
-      if (gradId === 'grad-ocean') return { background: 'linear-gradient(135deg, #2193b0, #6dd5ed)', border: 'none' };
-      if (gradId === 'grad-rainbow') return { background: 'linear-gradient(135deg, #ee9ca7, #ffdde1)', border: 'none' };
-      if (gradId === 'grad-forest') return { background: 'linear-gradient(135deg, #11998e, #38ef7d)', border: 'none' };
-      if (gradId === 'grad-magic') return { background: 'linear-gradient(135deg, #8a2387, #e94057)', border: 'none' };
-      if (gradId === 'grad-cotton') return { background: 'linear-gradient(135deg, #ff758c, #ff7eb3)', border: 'none' };
+  const getSwatchStyle = (color) => {
+    if (color.startsWith('url(#grad-')) {
+      const id = color.slice(5, -1);
+      const MAP = {
+        'grad-sunset':  'linear-gradient(135deg,#ff5f6d,#ffc371)',
+        'grad-ocean':   'linear-gradient(135deg,#2193b0,#6dd5ed)',
+        'grad-rainbow': 'linear-gradient(135deg,#ee9ca7,#ffdde1)',
+        'grad-forest':  'linear-gradient(135deg,#11998e,#38ef7d)',
+        'grad-magic':   'linear-gradient(135deg,#8a2387,#e94057)',
+        'grad-cotton':  'linear-gradient(135deg,#ff758c,#ff7eb3)',
+      };
+      return { background: MAP[id] || '#ccc', border: 'none' };
     }
-    // Solid / Pastel
-    return { 
+    return {
       backgroundColor: color,
-      border: color === '#ffffff' ? '4px solid #ccc' : `4px solid ${color}`
+      border: color === '#ffffff' ? '4px solid #ccc' : `4px solid ${color}`,
     };
   };
 
-  const filteredTemplates = Object.entries(TEMPLATES).filter(([key, t]) => {
-    if (selectedCategory === 'all') return true;
-    return t.category === selectedCategory;
-  });
-
+  const filteredTemplates = Object.entries(TEMPLATES).filter(([, t]) =>
+    selectedCategory === 'all' || t.category === selectedCategory
+  );
   const activeTemplate = TEMPLATES[templateKey] || TEMPLATES['lion'];
+  const getEmoji = (name) => (name.match(/[\p{Emoji}\u200d]+/gu) || ['🎨'])[0];
+  const cleanName = (name) => name.replace(/[\p{Emoji}\u200d]+/gu, '').trim();
 
-  // Select current palette items
-  const currentPalette = 
-    activePaletteTab === 'solid' 
-      ? SOLID_COLORS 
-      : activePaletteTab === 'pastel' 
-        ? PASTEL_COLORS 
-        : GRADIENTS.map(g => g.value);
+  const currentPalette =
+    activePaletteTab === 'solid'   ? SOLID_COLORS :
+    activePaletteTab === 'pastel'  ? PASTEL_COLORS :
+    GRADIENTS.map(g => g.value);
 
   return (
     <div className="coloring-dashboard">
-      <div className="dashboard-controls">
-        <div className="control-group">
-          <span className="control-label">Drawing Tools</span>
-          <div className="buttons-row">
-            <button 
-              onClick={() => setMode('tap')} 
-              className={`mode-btn ${mode === 'tap' ? 'active' : ''}`}
-            >
-              👉 Tap to Fill
-            </button>
-            <button 
-              onClick={() => setMode('draw')} 
-              className={`mode-btn ${mode === 'draw' ? 'active' : ''}`}
-            >
-              🖍️ Crayon Brush
-            </button>
-          </div>
-        </div>
 
-        {mode === 'draw' && (
+      {/* ── Brush Toolbar ── */}
+      <div className="brush-toolbar">
+        {BRUSH_ORDER.map((bt) => {
+          const info = BRUSH_TYPES[bt];
+          return (
+            <button
+              key={bt}
+              onClick={() => setBrushType(bt)}
+              className={`brush-tool-btn ${brushType === bt ? 'active' : ''}`}
+              title={info.labelId}
+            >
+              <span className="brush-icon">{info.label.split(' ')[0]}</span>
+              <span className="brush-label">{info.labelId}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Secondary Options Row ── */}
+      <div className="options-row">
+        {/* Brush size — hidden for fill and stamp */}
+        {brushType !== 'fill' && brushType !== 'stamp' && (
           <div className="control-group">
-            <span className="control-label">Brush Size (Ukuran Crayon)</span>
+            <span className="control-label">Ukuran</span>
             <div className="buttons-row">
-              <button 
-                onClick={() => setBrushSize(10)} 
-                className={`mode-btn size-btn ${brushSize === 10 ? 'active' : ''}`}
-              >
-                👶 Kecil
-              </button>
-              <button 
-                onClick={() => setBrushSize(18)} 
-                className={`mode-btn size-btn ${brushSize === 18 ? 'active' : ''}`}
-              >
-                🧒 Sedang
-              </button>
-              <button 
-                onClick={() => setBrushSize(28)} 
-                className={`mode-btn size-btn ${brushSize === 28 ? 'active' : ''}`}
-              >
-                🧑 Besar
-              </button>
+              {[{ v: 8, l: 'S' }, { v: 18, l: 'M' }, { v: 28, l: 'L' }].map(({ v, l }) => (
+                <button
+                  key={v}
+                  onClick={() => setBrushSize(v)}
+                  className={`size-btn ${brushSize === v ? 'active' : ''}`}
+                >
+                  {l}
+                </button>
+              ))}
             </div>
           </div>
         )}
 
+        {/* Stamp shape picker */}
+        {brushType === 'stamp' && (
+          <div className="control-group">
+            <span className="control-label">Bentuk Stempel</span>
+            <div className="buttons-row">
+              {STAMP_SHAPES.map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => setStampShape(id)}
+                  className={`size-btn ${stampShape === id ? 'active' : ''}`}
+                  style={{ fontSize: '22px' }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Gallery picker */}
         <div className="control-group">
-          <span className="control-label">Drawing Page</span>
-          <button 
-            onClick={() => setIsGalleryOpen(true)} 
-            className="open-gallery-btn"
-          >
+          <span className="control-label">Halaman</span>
+          <button onClick={() => setIsGalleryOpen(true)} className="open-gallery-btn">
             📂 {activeTemplate.name}
           </button>
         </div>
 
+        {/* Clear */}
         <div className="control-group">
-          <button onClick={handleClear} className="clear-btn">
-            🔄 Clear Page
+          <button onClick={() => setResetKey(k => k + 1)} className="clear-btn">
+            🔄 Hapus
           </button>
         </div>
       </div>
 
+      {/* ── Canvas Area ── */}
       <div className="canvas-viewport">
-        {mode === 'tap' ? (
-          <div key={`tap-${templateKey}-${resetKey}`} className="canvas-frame">
-            <TapToFill 
-              svgData={activeTemplate.svg} 
-              selectedColor={selectedColor} 
-            />
+        {isFillMode ? (
+          <div key={`fill-${templateKey}-${resetKey}`} className="canvas-frame">
+            <TapToFill svgData={activeTemplate.svg} selectedColor={selectedColor} />
           </div>
         ) : (
           <div key={`draw-${templateKey}-${resetKey}`} className="canvas-frame">
-            <CanvasMask 
-              templateKey={templateKey} 
-              selectedColor={selectedColor} 
+            <CanvasMask
+              templateKey={templateKey}
+              selectedColor={selectedColor}
               brushSize={brushSize}
+              brushType={brushType}
+              stampShape={stampShape}
             />
           </div>
         )}
       </div>
 
-      {/* Expanded Color Customization Hub */}
+      {/* ── Color Palette ── */}
       <div className="palette-panel">
         <div className="palette-tabs-row">
-          <button 
-            onClick={() => handlePaletteTabChange('solid')}
-            className={`palette-tab-btn ${activePaletteTab === 'solid' ? 'active' : ''}`}
-          >
-            🎨 Solid
-          </button>
-          <button 
-            onClick={() => handlePaletteTabChange('pastel')}
-            className={`palette-tab-btn ${activePaletteTab === 'pastel' ? 'active' : ''}`}
-          >
-            🌸 Pastel
-          </button>
-          <button 
-            onClick={() => handlePaletteTabChange('gradient')}
-            className={`palette-tab-btn ${activePaletteTab === 'gradient' ? 'active' : ''}`}
-          >
-            ✨ Gradasi
-          </button>
+          {['solid', 'pastel', 'gradient'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => handlePaletteTab(tab)}
+              className={`palette-tab-btn ${activePaletteTab === tab ? 'active' : ''}`}
+            >
+              {tab === 'solid' ? '🎨 Solid' : tab === 'pastel' ? '🌸 Pastel' : '✨ Gradasi'}
+            </button>
+          ))}
         </div>
-
         <div className="color-palette-bar">
           {currentPalette.map((color) => (
             <button
               key={color}
-              style={getPaletteStyle(color)}
+              style={getSwatchStyle(color)}
               className={`palette-color ${selectedColor === color ? 'selected' : ''}`}
               onClick={() => setSelectedColor(color)}
-              aria-label={`Select color ${color}`}
+              aria-label={`Pilih warna ${color}`}
             />
           ))}
         </div>
       </div>
 
-      {/* Premium Gallery Modal */}
+      {/* ── Gallery Modal ── */}
       {isGalleryOpen && (
         <div className="gallery-modal" onClick={() => setIsGalleryOpen(false)}>
-          <div className="gallery-content" onClick={(e) => e.stopPropagation()}>
+          <div className="gallery-content" onClick={e => e.stopPropagation()}>
             <div className="gallery-header">
-              <h2>Choose a Page to Color! 🎨</h2>
-              <button 
-                className="close-gallery-btn" 
-                onClick={() => setIsGalleryOpen(false)}
-                aria-label="Close Gallery"
-              >
-                ✕
-              </button>
+              <h2>Pilih Halaman Mewarnai! 🎨</h2>
+              <button className="close-gallery-btn" onClick={() => setIsGalleryOpen(false)}>✕</button>
             </div>
-
             <div className="category-tabs">
-              <button 
+              <button
                 onClick={() => setSelectedCategory('all')}
                 className={`category-tab ${selectedCategory === 'all' ? 'active' : ''}`}
               >
-                🎨 All Pages
+                🎨 Semua
               </button>
               {Object.entries(CATEGORIES).map(([catKey, cat]) => (
                 <button
@@ -260,26 +227,18 @@ export default function App() {
                 </button>
               ))}
             </div>
-
             <div className="templates-grid-viewport">
               <div className="templates-grid">
-                {filteredTemplates.map(([key, t]) => {
-                  const emoji = getTemplateEmoji(t.name);
-                  const cleanName = getCleanName(t.name);
-                  return (
-                    <div
-                      key={key}
-                      onClick={() => {
-                        setTemplateKey(key);
-                        setIsGalleryOpen(false);
-                      }}
-                      className={`template-card ${templateKey === key ? 'active' : ''}`}
-                    >
-                      <span className="card-emoji">{emoji}</span>
-                      <span className="card-name">{cleanName}</span>
-                    </div>
-                  );
-                })}
+                {filteredTemplates.map(([key, t]) => (
+                  <div
+                    key={key}
+                    onClick={() => { setTemplateKey(key); setIsGalleryOpen(false); }}
+                    className={`template-card ${templateKey === key ? 'active' : ''}`}
+                  >
+                    <span className="card-emoji">{getEmoji(t.name)}</span>
+                    <span className="card-name">{cleanName(t.name)}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

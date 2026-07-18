@@ -7,35 +7,36 @@ import { useAudioManager } from '../../hooks/useAudioManager';
 import { t } from '../../i18n/id';
 
 
-// Baseline Alphabet Data
+// Baseline Alphabet Data — exampleWord is Bahasa Indonesia (PAUD/TK vocabulary)
 const ALPHABET_DATA = {
-  'A': { letter: 'A', exampleWord: 'Apple', letterLower: 'a', letterUpper: 'A' },
-  'B': { letter: 'B', exampleWord: 'Boy', letterLower: 'b', letterUpper: 'B' },
-  'C': { letter: 'C', exampleWord: 'Cat', letterLower: 'c', letterUpper: 'C' },
-  'D': { letter: 'D', exampleWord: 'Dog', letterLower: 'd', letterUpper: 'D' },
-  'E': { letter: 'E', exampleWord: 'Egg', letterLower: 'e', letterUpper: 'E' },
-  'F': { letter: 'F', exampleWord: 'Fish', letterLower: 'f', letterUpper: 'F' },
-  'G': { letter: 'G', exampleWord: 'Goat', letterLower: 'g', letterUpper: 'G' },
-  'H': { letter: 'H', exampleWord: 'Hat', letterLower: 'h', letterUpper: 'H' },
-  'I': { letter: 'I', exampleWord: 'Igloo', letterLower: 'i', letterUpper: 'I' },
-  'J': { letter: 'J', exampleWord: 'Jar', letterLower: 'j', letterUpper: 'J' },
-  'K': { letter: 'K', exampleWord: 'Kite', letterLower: 'k', letterUpper: 'K' },
-  'L': { letter: 'L', exampleWord: 'Lion', letterLower: 'l', letterUpper: 'L' },
-  'M': { letter: 'M', exampleWord: 'Moon', letterLower: 'm', letterUpper: 'M' },
-  'N': { letter: 'N', exampleWord: 'Nest', letterLower: 'n', letterUpper: 'N' },
-  'O': { letter: 'O', exampleWord: 'Octopus', letterLower: 'o', letterUpper: 'O' },
-  'P': { letter: 'P', exampleWord: 'Pig', letterLower: 'p', letterUpper: 'P' },
-  'Q': { letter: 'Q', exampleWord: 'Queen', letterLower: 'q', letterUpper: 'Q' },
-  'R': { letter: 'R', exampleWord: 'Ring', letterLower: 'r', letterUpper: 'R' },
-  'S': { letter: 'S', exampleWord: 'Sun', letterLower: 's', letterUpper: 'S' },
-  'T': { letter: 'T', exampleWord: 'Turtle', letterLower: 't', letterUpper: 'T' },
-  'U': { letter: 'U', exampleWord: 'Umbrella', letterLower: 'u', letterUpper: 'U' },
-  'V': { letter: 'V', exampleWord: 'Volcano', letterLower: 'v', letterUpper: 'V' },
-  'W': { letter: 'W', exampleWord: 'Watch', letterLower: 'w', letterUpper: 'W' },
-  'X': { letter: 'X', exampleWord: 'X-ray', letterLower: 'x', letterUpper: 'X' },
-  'Y': { letter: 'Y', exampleWord: 'Yo-yo', letterLower: 'y', letterUpper: 'Y' },
-  'Z': { letter: 'Z', exampleWord: 'Zebra', letterLower: 'z', letterUpper: 'Z' }
+  'A': { letter: 'A', exampleWord: 'Ayam', letterLower: 'a', letterUpper: 'A' },     // Chicken
+  'B': { letter: 'B', exampleWord: 'Buku', letterLower: 'b', letterUpper: 'B' },     // Book
+  'C': { letter: 'C', exampleWord: 'Cacing', letterLower: 'c', letterUpper: 'C' },   // Worm
+  'D': { letter: 'D', exampleWord: 'Domba', letterLower: 'd', letterUpper: 'D' },    // Sheep
+  'E': { letter: 'E', exampleWord: 'Elang', letterLower: 'e', letterUpper: 'E' },    // Eagle
+  'F': { letter: 'F', exampleWord: 'Foto', letterLower: 'f', letterUpper: 'F' },     // Photo
+  'G': { letter: 'G', exampleWord: 'Gajah', letterLower: 'g', letterUpper: 'G' },   // Elephant
+  'H': { letter: 'H', exampleWord: 'Harimau', letterLower: 'h', letterUpper: 'H' }, // Tiger
+  'I': { letter: 'I', exampleWord: 'Ikan', letterLower: 'i', letterUpper: 'I' },    // Fish
+  'J': { letter: 'J', exampleWord: 'Jeruk', letterLower: 'j', letterUpper: 'J' },   // Orange
+  'K': { letter: 'K', exampleWord: 'Kucing', letterLower: 'k', letterUpper: 'K' },  // Cat
+  'L': { letter: 'L', exampleWord: 'Liontin', letterLower: 'l', letterUpper: 'L' }, // Locket
+  'M': { letter: 'M', exampleWord: 'Mobil', letterLower: 'm', letterUpper: 'M' },   // Car
+  'N': { letter: 'N', exampleWord: 'Nanas', letterLower: 'n', letterUpper: 'N' },   // Pineapple
+  'O': { letter: 'O', exampleWord: 'Orang', letterLower: 'o', letterUpper: 'O' },   // Person
+  'P': { letter: 'P', exampleWord: 'Pisang', letterLower: 'p', letterUpper: 'P' },  // Banana
+  'Q': { letter: 'Q', exampleWord: 'Quran', letterLower: 'q', letterUpper: 'Q' },   // Quran
+  'R': { letter: 'R', exampleWord: 'Roti', letterLower: 'r', letterUpper: 'R' },    // Bread
+  'S': { letter: 'S', exampleWord: 'Sapi', letterLower: 's', letterUpper: 'S' },    // Cow
+  'T': { letter: 'T', exampleWord: 'Tikus', letterLower: 't', letterUpper: 'T' },   // Mouse
+  'U': { letter: 'U', exampleWord: 'Ular', letterLower: 'u', letterUpper: 'U' },    // Snake
+  'V': { letter: 'V', exampleWord: 'Vitamin', letterLower: 'v', letterUpper: 'V' }, // Vitamin
+  'W': { letter: 'W', exampleWord: 'Wortel', letterLower: 'w', letterUpper: 'W' },  // Carrot
+  'X': { letter: 'X', exampleWord: 'Xilofon', letterLower: 'x', letterUpper: 'X' },// Xylophone
+  'Y': { letter: 'Y', exampleWord: 'Yogurt', letterLower: 'y', letterUpper: 'Y' },  // Yogurt
+  'Z': { letter: 'Z', exampleWord: 'Zebra', letterLower: 'z', letterUpper: 'Z' }    // Zebra
 };
+
 
 // Validate runtime structures with Zod
 const parsedAlphabetData = AlphabetDataSchema.parse(ALPHABET_DATA);
