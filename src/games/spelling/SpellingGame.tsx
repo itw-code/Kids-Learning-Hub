@@ -4,6 +4,7 @@ import { useSpeechSynthesis } from '../alphabet/useSpeechSynthesis';
 import { useAudioManager } from '../../hooks/useAudioManager';
 import { useProfileStore } from '../../stores/profileStore';
 import { idDict } from '../../i18n/id';
+import { ImagePreloader } from './imagePreloader';
 
 export const SpellingGame: React.FC = () => {
   const {
@@ -37,10 +38,47 @@ export const SpellingGame: React.FC = () => {
   const wordsList: WordData[] = idDict.spelling.words;
   const currentWord = wordsList[currentWordIndex];
 
+  const [displayedImage, setDisplayedImage] = useState<string>('');
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
+
   // Initialize word tiles on mount
   useEffect(() => {
     loadWord();
   }, [loadWord]);
+
+  // Sync, preload, and decode images off the main thread to prevent iPad Safari lag
+  useEffect(() => {
+    if (!currentWord) return;
+
+    let active = true;
+    setIsImageLoading(true);
+
+    // Decode current image (will resolve instantly if already preloaded)
+    ImagePreloader.preloadAndDecode(currentWord.image)
+      .then(() => {
+        if (active) {
+          setDisplayedImage(currentWord.image);
+          setIsImageLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setDisplayedImage(currentWord.image);
+          setIsImageLoading(false);
+        }
+      });
+
+    // Proactively preload & decode the next level's image in the background
+    const nextIndex = currentWordIndex + 1;
+    if (nextIndex < wordsList.length) {
+      const nextWordData = wordsList[nextIndex];
+      ImagePreloader.preloadAndDecode(nextWordData.image).catch(() => {});
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [currentWord, currentWordIndex, wordsList]);
 
   // Handle Confetti / Reward on completion
   useEffect(() => {
@@ -196,11 +234,24 @@ export const SpellingGame: React.FC = () => {
       <div className="w-full max-w-3xl flex flex-col items-center justify-center grow my-4 gap-6">
         {/* Word Picture Display Card */}
         <div className="relative group bg-white p-5 rounded-[40px] border-4 border-amber-300 shadow-lg flex flex-col items-center justify-center max-w-sm w-full transition-transform duration-300 hover:scale-[1.02]">
-          <img
-            src={currentWord.image}
-            alt={currentWord.displayWord}
-            className="w-48 h-48 sm:w-60 sm:h-60 object-cover rounded-3xl border-2 border-slate-100"
-          />
+          {/* Strict layout-shift prevention wrapper */}
+          <div className="w-48 h-48 sm:w-60 sm:h-60 relative overflow-hidden rounded-3xl border-2 border-slate-100 bg-slate-100 flex items-center justify-center">
+            {/* Smooth pulse skeleton overlay */}
+            <div 
+              className={`absolute inset-0 bg-slate-200/50 animate-pulse transition-opacity duration-300 ${
+                isImageLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            />
+            {displayedImage && (
+              <img
+                src={displayedImage}
+                alt={currentWord.displayWord}
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  isImageLoading ? 'opacity-0' : 'opacity-100'
+                }`}
+              />
+            )}
+          </div>
           <button
             onClick={playHint}
             className="mt-4 px-6 py-2 bg-amber-500 text-white font-extrabold rounded-2xl hover:bg-amber-600 active:scale-95 shadow-md flex items-center gap-2 text-sm sm:text-base transition-colors"
