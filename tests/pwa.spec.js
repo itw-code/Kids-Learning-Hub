@@ -5,6 +5,10 @@ test.use({ serviceWorkers: 'allow' });
 
 test.describe('PWA Service Worker & Caching', () => {
   test('should register service worker and work offline with clean URLs', async ({ context, page }) => {
+    // Print all browser logs and errors to the terminal
+    page.on('console', (msg) => console.log(`[PWA Browser Console] ${msg.type()}: ${msg.text()}`));
+    page.on('pageerror', (err) => console.error(`[PWA Browser PageError] ${err.message}`));
+
     // Navigate online to trigger SW registration
     await page.goto('/');
 
@@ -35,7 +39,7 @@ test.describe('PWA Service Worker & Caching', () => {
     expect(fallbackResponse?.status()).toBe(200);
 
     // The returned content should be index.html which contains the main hub title
-    const mainTitle = page.locator('#hub-container header h1');
+    const mainTitle = page.locator('h1', { hasText: 'Hub Belajar Anak' });
     await expect(mainTitle).toBeVisible();
   });
 });

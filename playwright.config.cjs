@@ -9,7 +9,7 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
-    serviceWorkers: 'block', // Block Service Workers by default to prevent cache contamination
+    serviceWorkers: 'allow', // Allow Service Workers to enable PWA offline cache validation
     launchOptions: {
       args: ['--autoplay-policy=no-user-gesture-required'] // Bypass autoplay policy
     }

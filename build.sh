@@ -7,23 +7,26 @@ echo "=================================================="
 echo "🚀 Starting Kids Learning Hub PWA Build Pipeline"
 echo "=================================================="
 
-# 1. Compile React coloring book app
-echo "📦 Building React Coloring Book App..."
+# 1. Compile legacy React coloring book app
+echo "📦 Building Legacy React Coloring Book App..."
 cd apps/coloring
 npm install
 npm run build
 cd ../..
 
-# 2. Package all static applications into /dist folder
-echo "📂 Packaging all static apps into output /dist folder..."
-rm -rf dist
+# 2. Compile new unified React/TypeScript portal
+echo "📦 Building New Unified React/TypeScript Portal..."
+npm install
+npm run build
+
+# 3. Package remaining static applications and assets into /dist folder
+echo "📂 Packaging all legacy assets into output /dist folder..."
+
+# Ensure target folders exist
 mkdir -p dist/apps
 
-# Copy PWA landing page and shared logic
-cp index.html dist/
-cp index.css dist/
+# Copy PWA landing page metadata and shared logic to dist
 cp manifest.json dist/
-cp sw.js dist/
 cp hub-nav.js dist/
 cp hub-nav.css dist/
 
@@ -32,10 +35,7 @@ if [ -d "assets" ]; then
   cp -r assets dist/
 fi
 
-# Copy baseline sub-apps
-echo "📁 Copying Alphabet game..."
-cp -r apps/alphabet dist/apps/
-
+# Copy legacy baseline sub-apps (DEPRECATED: Alphabet is now native React in the root app)
 echo "📁 Copying Numbers game..."
 cp -r apps/numbers dist/apps/
 

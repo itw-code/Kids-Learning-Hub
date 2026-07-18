@@ -1,26 +1,38 @@
-const CACHE_NAME = 'kids-hub-v5';
-const ASSETS = [
+const CACHE_NAME = 'kids-hub-v7';
+
+// Standalone variable to hold manifest list for injected assets
+const injectManifestList = self.__WB_MANIFEST;
+
+// Extract precache asset URLs compiled by Vite
+const precachedAssets = (injectManifestList || []).map((entry) => {
+  return typeof entry === 'string' ? entry : entry.url;
+});
+
+// Manual entry points for legacy sub-apps
+const MANUAL_ASSETS = [
   '/',
   '/index.html',
-  '/index.css',
-  '/manifest.json',
-  '/hub-nav.js',
-  '/hub-nav.css',
-  '/assets/icon-192.png',
-  '/assets/icon-512.png',
-  // Cache sub-apps index pages for immediate launch
-  '/apps/alphabet/',
+  '/manifest.webmanifest',
   '/apps/numbers/',
   '/apps/spelling/',
   '/apps/shapes/',
   '/apps/coloring/'
 ];
 
+// Combine all unique assets to populate the offline cache
+const ALL_ASSETS = [...new Set([...precachedAssets, ...MANUAL_ASSETS])];
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Caching app shell and static resources');
-      return cache.addAll(ASSETS);
+      console.log('[Service Worker] Caching all assets offline (Vanilla)');
+      return Promise.allSettled(
+        ALL_ASSETS.map((asset) =>
+          cache.add(asset).catch((err) =>
+            console.warn(`[Service Worker] Failed to cache asset: ${asset}`, err)
+          )
+        )
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -31,7 +43,7 @@ self.addEventListener('activate', (e) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[Service Worker] Removing old cache', key);
+            console.log('[Service Worker] Removing old cache:', key);
             return caches.delete(key);
           }
         })
@@ -41,7 +53,7 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Bypass service worker for range requests or audio/video assets
+  // Safari Range requests bypass (critical for HTML5 audio/video elements playback)
   if (
     e.request.headers.get('range') ||
     e.request.url.includes('.mp3') ||
@@ -58,7 +70,7 @@ self.addEventListener('fetch', (e) => {
         return cachedResponse;
       }
       return fetch(e.request).then((networkResponse) => {
-        // Only cache local requests successfully fetched (excluding chrome extensions, external APIs, etc.)
+        // Cache successful local requests dynamically
         if (
           networkResponse &&
           networkResponse.status === 200 &&
@@ -71,7 +83,7 @@ self.addEventListener('fetch', (e) => {
         }
         return networkResponse;
       }).catch(() => {
-        // Fallback for document navigation when offline
+        // Client side routing navigation fallback for clean URLs
         if (e.request.mode === 'navigate') {
           return caches.match('/index.html');
         }

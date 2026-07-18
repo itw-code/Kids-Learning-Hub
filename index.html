@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Kids Learning Hub</title>
-  <link rel="stylesheet" href="/index.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="manifest" href="/manifest.json">
   
   <!-- iOS Meta Tags for PWA install capability in Safari -->
@@ -14,34 +18,11 @@
   <meta name="apple-mobile-web-app-title" content="Kids Hub">
   <link rel="apple-touch-icon" href="/assets/icon-192.png">
 </head>
-<body>
-  <div id="hub-container">
-    <header>
-      <h1>Kids Learning Hub 🚀</h1>
-    </header>
-    <main class="grid-menu">
-      <a href="/apps/alphabet/" class="menu-card color-blue">
-        <span class="card-icon">🔤</span>
-        <span class="card-title">Alphabet</span>
-      </a>
-      <a href="/apps/numbers/" class="menu-card color-green">
-        <span class="card-icon">🔢</span>
-        <span class="card-title">Numbers</span>
-      </a>
-      <a href="/apps/spelling/" class="menu-card color-yellow">
-        <span class="card-icon">✏️</span>
-        <span class="card-title">Spelling</span>
-      </a>
-      <a href="/apps/shapes/" class="menu-card color-purple">
-        <span class="card-icon">📐</span>
-        <span class="card-title">Shapes</span>
-      </a>
-      <a href="/apps/coloring/" class="menu-card color-orange">
-        <span class="card-icon">🎨</span>
-        <span class="card-title">Coloring</span>
-      </a>
-    </main>
-  </div>
+<body class="bg-slate-50 m-0 p-0 overflow-x-hidden">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  
+  <!-- Service Worker PWA registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
