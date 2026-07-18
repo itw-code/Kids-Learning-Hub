@@ -1,6 +1,35 @@
 (function() {
     let audioPrimed = false;
 
+    const decodedImagesCache = {};
+
+    async function preloadAndDecodeImage(src) {
+        if (!src) return null;
+        if (decodedImagesCache[src]) {
+            return decodedImagesCache[src];
+        }
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = async () => {
+                try {
+                    if ('decode' in img) {
+                        await img.decode();
+                    }
+                    decodedImagesCache[src] = img;
+                    resolve(img);
+                } catch (err) {
+                    console.warn('[Spelling Image Preloader] Failed to decode image: ' + src, err);
+                    resolve(img);
+                }
+            };
+            img.onerror = () => {
+                console.error('[Spelling Image Preloader] Failed to load image: ' + src);
+                resolve(null);
+            };
+        });
+    }
+
     // --- GLOBAL STATE ---
     let currentLevel = 1; // 1 or 2
 
@@ -141,7 +170,18 @@
 
         function loadWord(wordIndex) {
             const currentWordData = imageGameData[wordIndex];
-            wordImage.src = currentWordData.image;
+            
+            // Only swap DOM src after off-main-thread decode completes
+            preloadAndDecodeImage(currentWordData.image).then((img) => {
+                if (img && currentImageWordIndex === wordIndex) {
+                    wordImage.src = currentWordData.image;
+                }
+            });
+
+            // Preload and decode next image in background
+            const nextIndex = (wordIndex + 1) % imageGameData.length;
+            preloadAndDecodeImage(imageGameData[nextIndex].image);
+
             if (window.speakText) window.speakText(currentWordData.word);
 
             lettersToSpell = currentWordData.word.split('');
@@ -236,7 +276,17 @@
             const missingIndex = Math.floor(Math.random() * word.length);
             expectedMissingLetter = word[missingIndex];
 
-            wordImageMissing.src = currentWordData.image;
+            // Only swap DOM src after off-main-thread decode completes
+            preloadAndDecodeImage(currentWordData.image).then((img) => {
+                if (img && currentMissingWordIndex === wordIndex) {
+                    wordImageMissing.src = currentWordData.image;
+                }
+            });
+
+            // Preload and decode next image in background
+            const nextIndex = (wordIndex + 1) % imageGameData.length;
+            preloadAndDecodeImage(imageGameData[nextIndex].image);
+
             wordBlanksContainerMissing.innerHTML = '';
             letterChoicesContainerMissing.innerHTML = '';
             nextWordButtonMissing.classList.add('hidden');
@@ -419,7 +469,18 @@
 
         function loadReadingLevel(index) {
             const data = readingData[index];
-            readingImage.src = data.image;
+            
+            // Only swap DOM src after off-main-thread decode completes
+            preloadAndDecodeImage(data.image).then((img) => {
+                if (img && readingIndex === index) {
+                    readingImage.src = data.image;
+                }
+            });
+
+            // Preload and decode next image in background
+            const nextIndex = (index + 1) % readingData.length;
+            preloadAndDecodeImage(readingData[nextIndex].image);
+
             sentenceList.innerHTML = '';
             nextReadingButton.classList.add('hidden');
 

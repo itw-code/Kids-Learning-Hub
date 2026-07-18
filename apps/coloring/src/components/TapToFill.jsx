@@ -22,7 +22,7 @@ const prepareSvgString = (svgString) => {
       (el.getAttribute('height') === '600' || el.getAttribute('height') === '100%') &&
       (!stroke || stroke === 'none');
       
-    const isOutline = id === 'outline' || className.includes('outline') || fill === 'none';
+    const isOutline = id === 'outline' || className.includes('outline') || (fill === 'none' && !className.includes('fillable') && !el.classList.contains('fillable'));
     
     if (!isBackground && !isOutline) {
       el.classList.add('fillable');
@@ -92,13 +92,12 @@ export default function TapToFill({ svgData, selectedColor }) {
       const target = e.target;
       const fillableTags = ['path', 'polygon', 'circle', 'ellipse', 'rect'];
       if (fillableTags.includes(target.tagName.toLowerCase())) {
-        const fill = target.getAttribute('fill');
         const id = target.getAttribute('id');
         const isFillable = target.classList.contains('fillable') || 
                            (target.getAttribute('class') && target.getAttribute('class').includes('fillable'));
         
         // Skip if it's explicitly non-fillable or not marked as fillable in templates
-        if (fill === 'none' || id === 'outline' || !isFillable) {
+        if (id === 'outline' || !isFillable) {
           return;
         }
         

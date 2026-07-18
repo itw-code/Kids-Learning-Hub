@@ -27,7 +27,7 @@ const prepareSvgString = (svgString) => {
       (el.getAttribute('height') === '600' || el.getAttribute('height') === '100%') &&
       (!stroke || stroke === 'none');
       
-    const isOutline = id === 'outline' || className.includes('outline') || fill === 'none';
+    const isOutline = id === 'outline' || className.includes('outline') || (fill === 'none' && !className.includes('fillable') && !el.classList.contains('fillable'));
     
     if (!isBackground && !isOutline) {
       el.classList.add('fillable');

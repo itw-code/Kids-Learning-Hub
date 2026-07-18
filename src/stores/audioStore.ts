@@ -179,10 +179,11 @@ export const useAudioStore = create<AudioStoreState>((set, get) => {
 
 if (typeof window !== 'undefined') {
   window.addEventListener('klh-audio-unlocked', () => {
-    useAudioStore.setState({ isAudioUnlocked: true });
+    useAudioStore.setState({ isAudioUnlocked: true, bgmMuted: false });
     const state = useAudioStore.getState();
     const bgm = getBgmAudio(state);
-    if (bgm && !state.bgmMuted) {
+    if (bgm) {
+      bgm.volume = state.bgmVolume;
       bgm.play().catch((e) => console.warn('Autoplay BGM from window event failed:', e));
     }
   });
