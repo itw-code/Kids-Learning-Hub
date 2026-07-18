@@ -17,11 +17,177 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kids Hub">
   <link rel="apple-touch-icon" href="/assets/icon-192.png">
+  
+  <style>
+    /* Fullscreen audio unlock overlay */
+    #audio-unlock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #7209b7 0%, #3f37c9 50%, #4cc9f0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      opacity: 1;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      font-family: 'Comic Neue', 'Outfit', sans-serif;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    #audio-unlock-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    
+    .unlock-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 90%;
+      animation: unlockFloat 3s ease-in-out infinite;
+    }
+    
+    .unlock-icon {
+      font-size: 6rem;
+      margin-bottom: 0.5rem;
+      user-select: none;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+    }
+    
+    .unlock-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: 0.03em;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .unlock-subtitle {
+      font-size: 1.5rem;
+      margin: 0;
+      opacity: 0.9;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .unlock-btn {
+      background: #ff007f;
+      color: white;
+      border: 4px solid white;
+      border-radius: 2rem;
+      padding: 1rem 3rem;
+      font-size: 1.75rem;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255,0,127,0.4), inset 0 4px 0 rgba(255,255,255,0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+      animation: unlockPulse 1.5s infinite;
+      font-family: inherit;
+    }
+    
+    .unlock-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 10px rgba(255,0,127,0.4);
+    }
+    
+    @keyframes unlockFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    
+    @keyframes unlockPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+  </style>
 </head>
 <body class="bg-slate-50 m-0 p-0 overflow-x-hidden">
   <div id="root"></div>
+
+  <!-- Fullscreen iOS Safari Audio Unlock Overlay -->
+  <div id="audio-unlock-overlay">
+    <div class="unlock-content">
+      <div class="unlock-icon">🎈</div>
+      <h1 class="unlock-title">Kids Learning Hub</h1>
+      <p class="unlock-subtitle">Mainan Edukasi Anak 🌟</p>
+      <button class="unlock-btn" id="unlock-button">Mulai Belajar ➔</button>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.tsx"></script>
   
+  <script>
+    // iOS Web Audio & Speech Synthesis Unlock Script
+    document.getElementById('unlock-button').addEventListener('click', async function unlock() {
+      // 1. Initialize and resume Web Audio context
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        try {
+          const ctx = new AudioContextClass();
+          if (ctx.state === 'suspended') {
+            await ctx.resume();
+          }
+          
+          // Play a silent 1-sample buffer to trigger the hardware unlock
+          const buffer = ctx.createBuffer(1, 1, 22050);
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(ctx.destination);
+          source.start(0);
+          
+          // Expose to window globally for downstream apps and stores
+          window.__audioUnlocked = true;
+          window.__audioContext = ctx;
+        } catch (e) {
+          console.warn('[Unlock] AudioContext unlock failed:', e);
+        }
+      }
+
+      // 2. Trigger dummy SpeechSynthesis to satisfy iOS text-to-speech interaction requirement
+      if ('speechSynthesis' in window) {
+        try {
+          // Speak an empty string to unlock the speech system silently
+          const utterance = new SpeechSynthesisUtterance('');
+          utterance.volume = 0;
+          window.speechSynthesis.speak(utterance);
+          window.__speechUnlocked = true;
+        } catch (e) {
+          console.warn('[Unlock] SpeechSynthesis unlock failed:', e);
+        }
+      }
+
+      // 3. Dispatch global event to notify Zustand state to autoplay background music
+      const unlockEvent = new CustomEvent('klh-audio-unlocked');
+      window.dispatchEvent(unlockEvent);
+
+      // 4. Fade out overlay and reveal the portal
+      const overlay = document.getElementById('audio-unlock-overlay');
+      if (overlay) {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+          overlay.remove();
+        }, 500); // matches CSS transition duration
+      }
+    });
+
+    // Auto-dismiss the overlay under automated test environments (e.g. Playwright)
+    if (navigator.webdriver) {
+      console.log('[Automation] Webdriver detected, auto-dismissing overlay...');
+      document.getElementById('unlock-button').click();
+    }
+  </script>
+
   <!-- Service Worker PWA registration -->
   <script>
     if ('serviceWorker' in navigator) {

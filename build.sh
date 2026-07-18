@@ -14,6 +14,11 @@ npm install
 npm run build
 cd ../..
 
+# Copy compiled React coloring book to public folder so Vite PWA scans and precaches its assets
+rm -rf public/apps/coloring
+mkdir -p public/apps/coloring
+cp -r apps/coloring/dist/* public/apps/coloring/
+
 # 2. Compile new unified React/TypeScript portal
 echo "📦 Building New Unified React/TypeScript Portal..."
 npm install
@@ -47,9 +52,7 @@ echo "📁 Copying global music..."
 cp -r apps/music dist/apps/
 
 # Overwrite coloring app folder with its compiled build output
-echo "📁 Packaging compiled React Coloring Book..."
-rm -rf dist/apps/coloring
-cp -r apps/coloring/dist dist/apps/coloring
+# React coloring book packaging is handled automatically via the public folder.
 
 echo "=================================================="
 echo "✅ Build pipeline finished successfully!"

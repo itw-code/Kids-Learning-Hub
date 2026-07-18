@@ -176,4 +176,16 @@ export const useAudioStore = create<AudioStoreState>((set, get) => {
     }
   };
 });
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('klh-audio-unlocked', () => {
+    useAudioStore.setState({ isAudioUnlocked: true });
+    const state = useAudioStore.getState();
+    const bgm = getBgmAudio(state);
+    if (bgm && !state.bgmMuted) {
+      bgm.play().catch((e) => console.warn('Autoplay BGM from window event failed:', e));
+    }
+  });
+}
+
 export type { AudioStoreState };

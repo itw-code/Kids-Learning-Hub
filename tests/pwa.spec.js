@@ -26,13 +26,13 @@ test.describe('PWA Service Worker & Caching', () => {
     // Go offline
     await context.setOffline(true);
 
-    // Navigate to a cached clean URL (e.g. /apps/spelling/)
-    const offlineResponse = await page.goto('/apps/spelling/');
+    // Navigate to a cached clean URL (e.g. /apps/coloring/)
+    const offlineResponse = await page.goto('/apps/coloring/');
     expect(offlineResponse?.status()).toBe(200);
 
-    // Verify Spelling game page components render offline
-    const title = page.locator('#main-menu h1');
-    await expect(title).toBeVisible();
+    // Verify Coloring game page components render offline
+    const dashboard = page.locator('.coloring-dashboard');
+    await expect(dashboard).toBeVisible();
 
     // Navigate to an uncached route to verify sw.js SPA fallback to /index.html
     const fallbackResponse = await page.goto('/apps/non-existent-app-fallback/');
