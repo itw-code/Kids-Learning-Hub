@@ -13,9 +13,6 @@ const MANUAL_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/apps/numbers/',
-  '/apps/spelling/',
-  '/apps/shapes/',
   '/apps/coloring/'
 ];
 
