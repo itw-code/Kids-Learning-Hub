@@ -1,7 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { TEMPLATES } from '../templates';
+import { EXTRA_TEMPLATES } from '../templates-extra';
 import { drawStroke, drawStamp, BRUSH_TYPES, STAMP_SHAPES } from '../utils/brushEngine';
 import { playColorSound } from '../utils/audio';
+
+const ALL_TEMPLATES = { ...TEMPLATES, ...EXTRA_TEMPLATES };
 
 // Helper to generate distinct RGB values based on index (for ID map)
 const getIdColor = (index) => {
@@ -54,7 +57,7 @@ export default function CanvasMask({
     const idCanvas = idCanvasRef.current;
     const idCtx = idCanvas.getContext('2d');
 
-    const template = TEMPLATES[templateKey];
+    const template = ALL_TEMPLATES[templateKey];
     if (!template) return;
 
     const rawSvg = template.svg;
@@ -66,10 +69,16 @@ export default function CanvasMask({
       const url = URL.createObjectURL(blob);
       const img = new Image();
       img.onload = () => {
-        targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-        targetCtx.drawImage(img, 0, 0, targetCanvas.width, targetCanvas.height);
+        if (targetCtx && targetCanvas) {
+          targetCtx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+          targetCtx.drawImage(img, 0, 0, targetCanvas.width, targetCanvas.height);
+        }
         URL.revokeObjectURL(url);
         if (onLoad) onLoad(img);
+      };
+      img.onerror = (err) => {
+        console.error('loadSvgToCanvas loading error:', err);
+        URL.revokeObjectURL(url);
       };
       img.src = url;
     };

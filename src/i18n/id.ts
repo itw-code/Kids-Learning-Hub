@@ -139,7 +139,18 @@ export const idDict: AppDictionary = {
       { id: 'matahari', word: 'MATAHARI', displayWord: 'Matahari', image: '/assets/id/matahari.jpg' },
       { id: 'buku', word: 'BUKU', displayWord: 'Buku', image: '/assets/id/buku.jpg' },
       { id: 'bola', word: 'BOLA', displayWord: 'Bola', image: '/assets/id/bola.jpg' },
-      { id: 'meja', word: 'MEJA', displayWord: 'Meja', image: '/assets/id/meja.jpg' }
+      { id: 'meja', word: 'MEJA', displayWord: 'Meja', image: '/assets/id/meja.jpg' },
+      { id: 'topi', word: 'TOPI', displayWord: 'Topi', image: '/assets/id/topi.jpg' },
+      { id: 'roti', word: 'ROTI', displayWord: 'Roti', image: '/assets/id/roti.jpg' },
+      { id: 'susu', word: 'SUSU', displayWord: 'Susu', image: '/assets/id/susu.jpg' },
+      { id: 'baju', word: 'BAJU', displayWord: 'Baju', image: '/assets/id/baju.jpg' },
+      { id: 'balon', word: 'BALON', displayWord: 'Balon', image: '/assets/id/balon.jpg' },
+      { id: 'wortel', word: 'WORTEL', displayWord: 'Wortel', image: '/assets/id/wortel.jpg' },
+      { id: 'tomat', word: 'TOMAT', displayWord: 'Tomat', image: '/assets/id/tomat.jpg' },
+      { id: 'pisang', word: 'PISANG', displayWord: 'Pisang', image: '/assets/id/pisang.jpg' },
+      { id: 'nanas', word: 'NANAS', displayWord: 'Nanas', image: '/assets/id/nanas.jpg' },
+      { id: 'palu', word: 'PALU', displayWord: 'Palu', image: '/assets/id/palu.jpg' },
+      { id: 'ikan', word: 'IKAN', displayWord: 'Ikan', image: '/assets/id/ikan.jpg' }
     ]
   },
   video: {
