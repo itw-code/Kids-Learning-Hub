@@ -1,14 +1,17 @@
 /**
- * brushEngine.js — Premium digital brush rendering engine.
+ * brushEngine.ts — Premium digital brush rendering engine.
  * Implements 8 distinct brush types for the Kids Learning Hub coloring app:
  * crayon, marker, pencil, watercolor, glitter, eraser, stamp, and fill (via TapToFill).
  */
 
-// ---------- Noise helpers for textured brushes ----------
+interface GrainOffset {
+  dx: number;
+  dy: number;
+}
 
 /** Returns a tiny array of random offsets for crayon/pencil grain */
-function grainOffsets(count) {
-  const offsets = [];
+function grainOffsets(count: number): GrainOffset[] {
+  const offsets: GrainOffset[] = [];
   for (let i = 0; i < count; i++) {
     offsets.push({ dx: (Math.random() - 0.5) * 2, dy: (Math.random() - 0.5) * 2 });
   }
@@ -19,31 +22,39 @@ function grainOffsets(count) {
 
 /**
  * Draws a single brush stroke segment from (prevX,prevY) → (x,y).
- * @param {CanvasRenderingContext2D} ctx
- * @param {number} prevX
- * @param {number} prevY
- * @param {number} x
- * @param {number} y
- * @param {string} color     — hex, rgb, or url(#grad-…) string
- * @param {number} size      — base brush size in pixels
- * @param {string} brushType — one of BRUSH_TYPES keys
  */
-export function drawStroke(ctx, prevX, prevY, x, y, color, size, brushType) {
+export function drawStroke(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  color: string,
+  size: number,
+  brushType: string
+): void {
   const resolvedColor = resolveColor(ctx, prevX, prevY, x, y, color, size);
 
   switch (brushType) {
-    case 'crayon':   drawCrayon(ctx, prevX, prevY, x, y, resolvedColor, size); break;
-    case 'marker':   drawMarker(ctx, prevX, prevY, x, y, resolvedColor, size); break;
-    case 'pencil':   drawPencil(ctx, prevX, prevY, x, y, resolvedColor, size); break;
+    case 'crayon':     drawCrayon(ctx, prevX, prevY, x, y, resolvedColor, size); break;
+    case 'marker':     drawMarker(ctx, prevX, prevY, x, y, resolvedColor, size); break;
+    case 'pencil':     drawPencil(ctx, prevX, prevY, x, y, resolvedColor, size); break;
     case 'watercolor': drawWatercolor(ctx, prevX, prevY, x, y, resolvedColor, size); break;
-    case 'glitter':  drawGlitter(ctx, x, y, resolvedColor, size); break;
-    case 'eraser':   drawEraser(ctx, prevX, prevY, x, y, size); break;
-    default:         drawMarker(ctx, prevX, prevY, x, y, resolvedColor, size);
+    case 'glitter':    drawGlitter(ctx, x, y, resolvedColor, size); break;
+    case 'eraser':     drawEraser(ctx, prevX, prevY, x, y, size); break;
+    default:           drawMarker(ctx, prevX, prevY, x, y, resolvedColor, size);
   }
 }
 
 /** Stamps a shape at (x,y) — used by the Stamper tool */
-export function drawStamp(ctx, x, y, color, size, stampShape) {
+export function drawStamp(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  color: string,
+  size: number,
+  stampShape: string
+): void {
   const resolvedColor = resolveColor(ctx, x, y, x + 1, y + 1, color, size);
   ctx.save();
   ctx.translate(x, y);
@@ -65,11 +76,19 @@ export function drawStamp(ctx, x, y, color, size, stampShape) {
 }
 
 // ---------- Gradient resolver ----------
-function resolveColor(ctx, x1, y1, x2, y2, color, size) {
+function resolveColor(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  color: string,
+  size: number
+): string | CanvasGradient {
   if (!color.startsWith('url(#grad-')) return color;
   const gradId = color.substring(5, color.length - 1);
   const grad = ctx.createLinearGradient(x1 - size, y1 - size, x2 + size, y2 + size);
-  const GRAD_STOPS = {
+  const GRAD_STOPS: Record<string, [string, string]> = {
     'grad-sunset':  ['#ff5f6d', '#ffc371'],
     'grad-ocean':   ['#2193b0', '#6dd5ed'],
     'grad-rainbow': ['#ee9ca7', '#ffdde1'],
@@ -93,19 +112,32 @@ function resolveColor(ctx, x1, y1, x2, y2, color, size) {
 // ---------- Individual brush implementations ----------
 
 /** Crayon: grainy, waxy, slightly opaque with random grain particles */
-function drawCrayon(ctx, prevX, prevY, x, y, color, size) {
+function drawCrayon(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  color: string | CanvasGradient,
+  size: number
+): void {
   ctx.save();
   ctx.globalAlpha = 0.55;
   ctx.lineWidth = size;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.strokeStyle = color;
+  
+  // Apply visual crayon texture filter in browsers supporting it
+  ctx.filter = 'url(#crayon-filter)';
+
   ctx.beginPath();
   ctx.moveTo(prevX, prevY);
   ctx.lineTo(x, y);
   ctx.stroke();
 
   // Grain particles — scattered dots to simulate wax grain
+  ctx.filter = 'none';
   ctx.globalAlpha = 0.12;
   const grains = grainOffsets(Math.floor(size * 2));
   grains.forEach(({ dx, dy }) => {
@@ -120,13 +152,25 @@ function drawCrayon(ctx, prevX, prevY, x, y, color, size) {
 }
 
 /** Marker: smooth, thick, fully opaque — simulates felt-tip saturation */
-function drawMarker(ctx, prevX, prevY, x, y, color, size) {
+function drawMarker(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  color: string | CanvasGradient,
+  size: number
+): void {
   ctx.save();
   ctx.globalAlpha = 0.92;
   ctx.lineWidth = size * 1.3;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.strokeStyle = color;
+  
+  // Apply marker visual texture filter
+  ctx.filter = 'url(#marker-filter)';
+
   ctx.beginPath();
   ctx.moveTo(prevX, prevY);
   ctx.lineTo(x, y);
@@ -135,7 +179,15 @@ function drawMarker(ctx, prevX, prevY, x, y, color, size) {
 }
 
 /** Pencil: thin, textured, slightly lighter — builds up with repeated strokes */
-function drawPencil(ctx, prevX, prevY, x, y, color, size) {
+function drawPencil(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  color: string | CanvasGradient,
+  size: number
+): void {
   const pencilSize = Math.max(size * 0.45, 2);
   ctx.save();
   ctx.globalAlpha = 0.35;
@@ -160,14 +212,22 @@ function drawPencil(ctx, prevX, prevY, x, y, color, size) {
 }
 
 /** Watercolor: semi-transparent, soft-edged, with a feathered glow */
-function drawWatercolor(ctx, prevX, prevY, x, y, color, size) {
+function drawWatercolor(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  color: string | CanvasGradient,
+  size: number
+): void {
   ctx.save();
   // Soft base wash
   ctx.globalAlpha = 0.18;
   ctx.lineWidth = size * 2.5;
   ctx.lineCap = 'round';
   ctx.strokeStyle = color;
-  ctx.shadowColor = color;
+  ctx.shadowColor = typeof color === 'string' ? color : '#999';
   ctx.shadowBlur = size * 2;
   ctx.beginPath();
   ctx.moveTo(prevX, prevY);
@@ -186,7 +246,13 @@ function drawWatercolor(ctx, prevX, prevY, x, y, color, size) {
 }
 
 /** Glitter: sparkling multi-dot trail — neon/metallic look */
-function drawGlitter(ctx, x, y, color, size) {
+function drawGlitter(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  color: string | CanvasGradient,
+  size: number
+): void {
   const SPARKLE_COLORS = ['#ffe44d', '#ff70ff', '#70d6ff', '#b5ff70', '#ff9f45', '#ffffff'];
   ctx.save();
   const count = Math.floor(size * 3);
@@ -209,7 +275,7 @@ function drawGlitter(ctx, x, y, color, size) {
   // Core glowing dot
   ctx.globalAlpha = 0.6;
   ctx.fillStyle = color;
-  ctx.shadowColor = color;
+  ctx.shadowColor = typeof color === 'string' ? color : '#999';
   ctx.shadowBlur = size;
   ctx.beginPath();
   ctx.arc(x, y, size * 0.3, 0, Math.PI * 2);
@@ -218,7 +284,14 @@ function drawGlitter(ctx, x, y, color, size) {
 }
 
 /** Eraser: clears pixels back to white */
-function drawEraser(ctx, prevX, prevY, x, y, size) {
+function drawEraser(
+  ctx: CanvasRenderingContext2D,
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number,
+  size: number
+): void {
   ctx.save();
   ctx.globalCompositeOperation = 'source-over';
   ctx.strokeStyle = '#ffffff';
@@ -234,7 +307,7 @@ function drawEraser(ctx, prevX, prevY, x, y, size) {
 
 // ---------- Stamp shape helpers ----------
 
-function drawStar(ctx, cx, cy, r, points) {
+function drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, points: number): void {
   const inner = r * 0.45;
   ctx.beginPath();
   for (let i = 0; i < points * 2; i++) {
@@ -248,7 +321,7 @@ function drawStar(ctx, cx, cy, r, points) {
   ctx.stroke();
 }
 
-function drawHeart(ctx, cx, cy, r) {
+function drawHeart(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
   const s = r * 0.85;
   ctx.beginPath();
   ctx.moveTo(cx, cy + s * 0.3);
@@ -259,7 +332,7 @@ function drawHeart(ctx, cx, cy, r) {
   ctx.fill();
 }
 
-function drawSmiley(ctx, cx, cy, r) {
+function drawSmiley(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
   // Face
   ctx.fillStyle = '#ffe44d';
   ctx.beginPath();
@@ -279,7 +352,7 @@ function drawSmiley(ctx, cx, cy, r) {
   ctx.stroke();
 }
 
-function drawFlower(ctx, cx, cy, r) {
+function drawFlower(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
   const petals = 6;
   const petalR = r * 0.45;
   for (let i = 0; i < petals; i++) {
@@ -301,7 +374,7 @@ function drawFlower(ctx, cx, cy, r) {
   ctx.fill();
 }
 
-function drawCircleStamp(ctx, cx, cy, r) {
+function drawCircleStamp(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
@@ -309,7 +382,13 @@ function drawCircleStamp(ctx, cx, cy, r) {
 
 // ---------- Brush metadata ----------
 
-export const BRUSH_TYPES = {
+interface BrushInfo {
+  label: string;
+  labelId: string;
+  cursor: string;
+}
+
+export const BRUSH_TYPES: Record<string, BrushInfo> = {
   fill:       { label: '🪣 Cat',       labelId: 'Isi Warna',   cursor: 'cell' },
   crayon:     { label: '🖍️ Krayon',   labelId: 'Krayon',      cursor: 'crosshair' },
   marker:     { label: '✏️ Spidol',   labelId: 'Spidol',      cursor: 'crosshair' },
@@ -320,7 +399,12 @@ export const BRUSH_TYPES = {
   stamp:      { label: '⭐ Stempel',   labelId: 'Stempel',     cursor: 'cell' },
 };
 
-export const STAMP_SHAPES = [
+export interface StampShape {
+  id: string;
+  label: string;
+}
+
+export const STAMP_SHAPES: StampShape[] = [
   { id: 'star',   label: '⭐' },
   { id: 'heart',  label: '❤️' },
   { id: 'smiley', label: '😊' },

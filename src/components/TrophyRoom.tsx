@@ -75,6 +75,14 @@ const ALL_STICKERS: StickerItem[] = [
     color: '#3F51B5',
     desc: 'Bermain setelah waktu istirahat malam!',
     hint: 'Bisa didapatkan dengan belajar setelah jam 7 malam.'
+  },
+  {
+    id: 'coloring_master',
+    name: 'Guru Mewarnai',
+    icon: '🎨',
+    color: '#E91E63',
+    desc: 'Hebat! Kamu telah mewarnai gambar dengan sempurna!',
+    hint: 'Bisa didapatkan dengan menyelesaikan game mewarnai.'
   }
 ];
 

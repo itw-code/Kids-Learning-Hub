@@ -10,6 +10,7 @@
         'color_captain': { name: 'Color Captain', icon: '🎨', color: '#FF5722', desc: 'Sorted all the colors!', speech: 'Color Captain to the rescue!' },
         'spelling_bee': { name: 'Spelling Bee', icon: '🐝', color: '#FFC107', desc: 'Spelled words correctly!', speech: 'Buzz! Spelling Bee!' },
         'book_worm': { name: 'Book Worm', icon: '📚', color: '#4CAF50', desc: 'Read the sentences!', speech: 'I love reading!' },
+        'coloring_master': { name: 'Coloring Master', icon: '🎨', color: '#E91E63', desc: 'Completed a coloring page!', speech: 'You are a coloring master!' },
 
         // --- HIDDEN STICKERS (EASTER EGGS) ---
         'clicker_owl': { name: 'The Clicker', icon: '🖱️', color: '#9C27B0', desc: 'Clicked the logo 10 times!', speech: 'You found the Clicker Owl!' },
