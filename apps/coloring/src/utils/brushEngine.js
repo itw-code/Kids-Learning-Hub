@@ -76,12 +76,19 @@ function resolveColor(ctx, x1, y1, x2, y2, color, size) {
     'grad-forest':  ['#11998e', '#38ef7d'],
     'grad-magic':   ['#8a2387', '#e94057'],
     'grad-cotton':  ['#ff758c', '#ff7eb3'],
+    'grad-fire':    ['#f83600', '#f9d423'],
+    'grad-ice':     ['#a8edea', '#fed6e3'],
+    'grad-galaxy':  ['#0f0c29', '#302b63'],
+    'grad-lemon':   ['#f7971e', '#ffd200'],
+    'grad-mint':    ['#00b09b', '#96c93d'],
+    'grad-rose':    ['#f953c6', '#b91d73'],
   };
   const stops = GRAD_STOPS[gradId] || ['#999', '#ccc'];
   grad.addColorStop(0, stops[0]);
   grad.addColorStop(1, stops[1]);
   return grad;
 }
+
 
 // ---------- Individual brush implementations ----------
 

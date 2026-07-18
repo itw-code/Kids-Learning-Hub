@@ -3,6 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('SVG TapToFill Component', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/apps/coloring/');
+    // Switch to Fill mode ("Isi Warna") so that the TapToFill SVG component renders
+    const fillBtn = page.locator('button', { hasText: 'Isi Warna' });
+    await expect(fillBtn).toBeVisible();
+    await fillBtn.click();
     await page.waitForSelector('.svg-fill-container');
   });
 
@@ -25,16 +29,16 @@ test.describe('SVG TapToFill Component', () => {
       }
     });
 
-    // Verify fill attribute has updated to #ff595e
-    await expect(fillablePath).toHaveAttribute('fill', '#ff595e');
+    // Verify fill attribute has updated to #ff0000 (which is the default selected color in vivid)
+    await expect(fillablePath).toHaveAttribute('fill', '#ff0000');
 
-    // Select a new color from the palette: Orange (#ff924c)
-    const orangePaletteBtn = page.locator('button[aria-label="Select color #ff924c"]');
+    // Select a new color from the palette: Orange (#ff4500)
+    const orangePaletteBtn = page.locator('button[aria-label="Pilih warna #ff4500"]');
     await expect(orangePaletteBtn).toBeVisible();
     await orangePaletteBtn.click();
 
-    // Verify the previously filled path still maintains the #ff595e color (no reconciliation reset!)
-    await expect(fillablePath).toHaveAttribute('fill', '#ff595e');
+    // Verify the previously filled path still maintains the #ff0000 color (no reconciliation reset!)
+    await expect(fillablePath).toHaveAttribute('fill', '#ff0000');
 
     // Dispatch a click event to the second fillable shape
     await page.evaluate(() => {
@@ -46,7 +50,7 @@ test.describe('SVG TapToFill Component', () => {
 
     // Verify Shape 2 is filled with Orange, and Shape 1 remains red
     const secondPath = svgContainer.locator('.fillable').nth(1);
-    await expect(secondPath).toHaveAttribute('fill', '#ff924c');
-    await expect(fillablePath).toHaveAttribute('fill', '#ff595e');
+    await expect(secondPath).toHaveAttribute('fill', '#ff4500');
+    await expect(fillablePath).toHaveAttribute('fill', '#ff0000');
   });
 });

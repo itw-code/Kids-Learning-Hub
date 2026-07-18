@@ -10,7 +10,7 @@ test.describe('Canvas Coloring Component (Crayon Brush)', () => {
 
   test('should draw brush strokes correctly in crayon mode and preserve strokes on mouseUp', async ({ page }) => {
     // Switch to Crayon Brush mode
-    const crayonBtn = page.locator('button', { hasText: 'Crayon Brush' });
+    const crayonBtn = page.locator('button', { hasText: 'Krayon' });
     await expect(crayonBtn).toBeVisible();
     await crayonBtn.click();
 
