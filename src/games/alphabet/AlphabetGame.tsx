@@ -446,13 +446,19 @@ export const AlphabetGame: React.FC = () => {
         {/* Toggle Game Options */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
-            onClick={toggleSpeechMode}
+            onClick={() => {
+              lastInteractedLetterRef.current = null;
+              toggleSpeechMode();
+            }}
             className="px-5 py-2.5 bg-slate-800 text-white font-semibold rounded-2xl hover:bg-slate-700 transition-colors shadow-sm active:scale-95 text-sm sm:text-base"
           >
             {speechMode === 'letter' ? t('alphabet', 'switchWords') : t('alphabet', 'switchLetters')}
           </button>
           <button
-            onClick={toggleCaseMode}
+            onClick={() => {
+              lastInteractedLetterRef.current = null;
+              toggleCaseMode();
+            }}
             className="px-5 py-2.5 bg-slate-800 text-white font-semibold rounded-2xl hover:bg-slate-700 transition-colors shadow-sm active:scale-95 text-sm sm:text-base"
           >
             {caseMode === 'upper' ? t('alphabet', 'switchLowercase') : t('alphabet', 'switchUppercase')}

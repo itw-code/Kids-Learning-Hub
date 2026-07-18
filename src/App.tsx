@@ -4,6 +4,7 @@ import { HubLayout } from './components/HubLayout';
 import { AlphabetGame } from './games/alphabet/AlphabetGame';
 import { NumbersHub } from './games/numbers/NumbersHub';
 import { ShapesHub } from './games/shapes/ShapesHub';
+import { SpellingGame } from './games/spelling/SpellingGame';
 import { TrophyRoom } from './components/TrophyRoom';
 import { HomeButton } from './components/HomeButton';
 
@@ -18,6 +19,7 @@ export const App: React.FC = () => {
         <Route path="/alphabet" element={<AlphabetGame />} />
         <Route path="/numbers" element={<NumbersHub />} />
         <Route path="/shapes" element={<ShapesHub />} />
+        <Route path="/spelling" element={<SpellingGame />} />
         <Route path="/trophy" element={<TrophyRoom />} />
         {/* Fallback to Hub */}
         <Route path="*" element={<HubLayout />} />

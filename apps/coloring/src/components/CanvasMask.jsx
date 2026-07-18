@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { TEMPLATES } from '../templates';
+import { playColorSound } from '../utils/audio';
 
 // Helper to generate distinct RGB values based on index
 const getIdColor = (index) => {
@@ -183,6 +184,7 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
       tempCtx.moveTo(x, y);
       
       setIsDrawing(true);
+      playColorSound(); // Sound FX on draw start
     }
   };
 
@@ -197,7 +199,29 @@ export default function CanvasMask({ templateKey = 'flower', selectedColor, brus
     
     // Draw brush line segment on temp canvas
     tempCtx.lineTo(x, y);
-    tempCtx.strokeStyle = selectedColor;
+    
+    // Gradient Stroke Resolution
+    let strokeStyle = selectedColor;
+    if (selectedColor.startsWith('url(#grad-')) {
+      const gradId = selectedColor.substring(5, selectedColor.length - 1);
+      const grad = tempCtx.createLinearGradient(x - brushSize, y - brushSize, x + brushSize, y + brushSize);
+      if (gradId === 'grad-sunset') {
+        grad.addColorStop(0, '#ff5f6d'); grad.addColorStop(1, '#ffc371');
+      } else if (gradId === 'grad-ocean') {
+        grad.addColorStop(0, '#2193b0'); grad.addColorStop(1, '#6dd5ed');
+      } else if (gradId === 'grad-rainbow') {
+        grad.addColorStop(0, '#ee9ca7'); grad.addColorStop(1, '#ffdde1');
+      } else if (gradId === 'grad-forest') {
+        grad.addColorStop(0, '#11998e'); grad.addColorStop(1, '#38ef7d');
+      } else if (gradId === 'grad-magic') {
+        grad.addColorStop(0, '#8a2387'); grad.addColorStop(1, '#e94057');
+      } else if (gradId === 'grad-cotton') {
+        grad.addColorStop(0, '#ff758c'); grad.addColorStop(1, '#ff7eb3');
+      }
+      strokeStyle = grad;
+    }
+
+    tempCtx.strokeStyle = strokeStyle;
     tempCtx.lineWidth = brushSize;
     tempCtx.lineCap = 'round';
     tempCtx.lineJoin = 'round';

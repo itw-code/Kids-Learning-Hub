@@ -44,8 +44,8 @@ export const HubLayout: React.FC = () => {
       gradient: 'from-amber-300 to-orange-400 shadow-amber-200',
       textColor: 'text-amber-950',
       borderColors: 'border-amber-300',
-      path: '/apps/spelling/',
-      isExternal: true,
+      path: '/spelling',
+      isExternal: false,
     },
     {
       title: t('hub', 'apps').shapes,
